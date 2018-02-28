@@ -1,2 +1,1 @@
-# Camera
-Camera functionality for the Raspberry Pi module
+Includes all RPI functionality for the project.
