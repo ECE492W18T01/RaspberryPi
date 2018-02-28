@@ -2,8 +2,10 @@
 import pygame
 
 class DS4:
-    R2 = 7
-    LR_AXIS = 1
+    name = None
+    r2 = 7
+    lr_axis = 1
+    joystick = None
 
     def connect(self):
         pygame.init()
@@ -19,12 +21,10 @@ class DS4:
         }
 
     def get_acceleration(self):
-        #return self.joystick.get_button(self.R2)
-        return 1
+        return self.joystick.get_button(self.r2)
 
     def get_steering(self):
-        #return self.joystick.get_axis(self.LR_AXIS)
-        return 180
+        return self.joystick.get_axis(self.lr_axis)
 
     def disconnect(self):
         pygame.quit()
