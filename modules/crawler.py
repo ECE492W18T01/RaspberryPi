@@ -9,12 +9,16 @@ LEFT = -180
 RIGHT = 180
 
 MOTOR_PIN = 24
+STEERING_PIN = 26
 
 class Crawler:
     motor = 0
     steering = 0
 
     def __init__(self):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(MOTOR_PIN, GPIO.OUT)
+        GPIO.setup(STEERING_PIN, GPIO.OUT)
         print('Crawler connected')
 
     def set_motor(self, command):
