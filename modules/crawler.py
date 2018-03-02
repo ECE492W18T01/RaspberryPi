@@ -11,7 +11,7 @@ class Crawler:
     READ_SIZE = 10
 
     motor = 0
-    steering = 0.0
+    steering = CENTER
 
     wheels = {
         'fl' : 0,
@@ -23,8 +23,12 @@ class Crawler:
     battery = 0
 
     def connect(self):
-        port = serial.Serial("/dev/serial0", baudrate=self.BAUDRATE, timeout=self.TIMEOUT)
-        print('Crawler connected on serial0')
+        try:
+            port = serial.Serial("/dev/serial0", baudrate=self.BAUDRATE, timeout=self.TIMEOUT)
+            print('Crawler connected on serial0')
+            break
+        except TimeoutError():
+            print("Cannot connect to crawler")
 
 
     def set_motor(self, mode):

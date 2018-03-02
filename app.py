@@ -19,7 +19,7 @@ controller = DS4()
 controller.connect()
 
 crawler = Crawler()
-crawler.connect()
+#crawler.connect()
 
 network = Network(enable=False)
 network.connect()
@@ -29,10 +29,10 @@ try:
         data = 1
         network.send(data)
 
-        crawler.set_motor(controller.get_input(controller.r2))
-        crawler.set_steering(controller.get_input_axis()['x'])
+        crawler.set_motor(controller.get_button(controller.R2))
+        crawler.set_steering(controller.get_axis()[controller.LEFT_X_AXIS])
         crawler.send_instructions()
-
+        sleep(0.1)
 finally:
     network.finish()
     controller.disconnect()

@@ -30,6 +30,7 @@ def crawler_test():
         crawler.connect()
         crawler.set_motor(1)
         crawler.set_steering(1)
+        crawler.send_instructions()
     finally:
         crawler.disconnect()
 
@@ -43,7 +44,7 @@ def controller_test():
     try:
         while testing:
             print("R2: ", controller.get_button(controller.R2))
-            print("x: ", controller.get_axis()[controller.LEFT_X_AXIS], "\n")
+            print("X: ", controller.get_axis()[controller.LEFT_X_AXIS], "\n")
             sleep(0.2)
 
     except KeyboardInterrupt:
