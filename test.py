@@ -1,15 +1,76 @@
+from picamera import PiCamera
+from time import sleep
 from modules.controller import DS4
 from modules.crawler import Crawler
+import RPi.GPIO as GPIO
+import serial
 
-controller = DS4()
-controller.connect()
-print(controller.name)
 
-crawler = Crawler()
+def gpio_test():
+    output_pin = 24
+    ON = 1
+    OFF = 0
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(output_pin, GPIO.OUT)
 
-commands = controller.get_input()
-crawler.set_motor(commands['acceleration'])
-crawler.set_steering(commands['steering'])
+    try:
+        while True:
+            GPIO.output(output_pin, ON)
+            sleep(0.5)
+            GPIO.output(output_pin, OFF)
+            sleep(0.5)
 
-controller.disconnect()
-crawler.disconnect()
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+
+
+def crawler_test():
+    crawler = Crawler()
+    try:
+        crawler.connect()
+        crawler.set_motor(1)
+        crawler.set_steering(1)
+    finally:
+        crawler.disconnect()
+
+
+def controller_test():
+    print "Controller test started..."
+    controller = DS4()
+    controller.connect()
+    print(controller.name)
+    testing = True
+    try:
+        while testing:
+            buttons = controller.get_input_buttons()
+            print(buttons)
+            axis = controller.get_input_axis()
+            print(axis)
+            sleep(0.2)
+
+    except KeyboardInterrupt:
+        testing = False
+
+    finally:
+        controller.disconnect()
+        print "Controller test ended."
+
+
+def camera_preview():
+    camera = PiCamera()
+    camera.start_preview()
+    sleep(10)
+    camera.stop_preview()
+
+
+def serial_test():
+    port = serial.Serial("/dev/serial0", baudrate=115200, timeout=3.0)
+    try:
+        while True:
+            port.write("Testing...")
+            time.sleep(1)
+            recieved = port.read(10)
+            print "Recieved" , recieved
+
+
+controller_test()

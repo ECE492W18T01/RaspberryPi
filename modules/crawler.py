@@ -1,30 +1,44 @@
 #Crawler class
 import RPi.GPIO as GPIO
-
-ON = 1
-OFF = 0
-
-CENTER = 0
-LEFT = -180
-RIGHT = 180
-
-MOTOR_PIN = 24
-STEERING_PIN = 26
+import serial
 
 class Crawler:
+    ON = 1
+    OFF = 0
+    CENTER = 0.0
+    BAUDRATE = 11520
+    TIMEOUT = 3.0
+    READ_SIZE = 10
+
     motor = 0
-    steering = 0
+    steering = 0.0
 
-    def __init__(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(MOTOR_PIN, GPIO.OUT)
-        GPIO.setup(STEERING_PIN, GPIO.OUT)
-        print('Crawler connected')
+    wheels = {
+        'fl' : 0,
+        'fr' : 0,
+        'rl' : 0,
+        'rr' : 0
+    }
 
-    def set_motor(self, command):
-        self.motor = command
-        GPIO.output(MOTOR_PIN, self.motor)
+    battery = 0
 
-    def set_steering(self, command):
-        self.steering = command
-        GPIO.output(STEERING_PIN, self.steering)
+    def connect(self):
+        port = serial.Serial("/dev/serial0", baudrate=self.BAUDRATE, timeout=self.TIMEOUT)
+        print('Crawler connected on serial0')
+
+
+    def set_motor(self, mode):
+        self.motor = mode
+
+
+    def set_steering(self, steering):
+        self.steering = steering
+
+
+    def send_instructions(self):
+        try:
+            port.write("%d, %d") % (self.motor, self.steering)
+            recieved = port.read(READ_SIZE)
+            print "Recieved" , recieved
+        except TimeoutError():
+            print "Timeout occured"

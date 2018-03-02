@@ -2,46 +2,38 @@ import io
 import socket
 import struct
 import time
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+import cv2
 from modules.controller import DS4
 from modules.crawler import Crawler
+from modules.network import Network
 
-#Network Variables
-NETWORK_ENABLED = 0
-HOST = 'localhost'
-PORT = 8080
 
-#Initilize Peripherals
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 32
+time.sleep(0.1)
+
 controller = DS4()
 controller.connect()
 
 crawler = Crawler()
 crawler.connect()
 
-#Build connection object and connect
-if NETWORK_ENABLED:
-    client = socket.socket()
-    print 'Connecting to %s:%d' % (HOST, PORT)
-    client.connect((HOST, PORT))
-    connection = client.makefile('wb')
-    print 'Connected'
+network = Network(enable=False)
+network.connect()
 
 try:
     while True:
-        #Send camera data across network
-        if NETWORK_ENABLED:
-            print('Sending stream over network')
+        data = 1
+        network.send(data)
 
-        #Recieve controller input
-        commands = controller.get_input()
-
-        #Output controller input to GPIO
-        crawler.set_motor(commands.acceleration)
-        crawler.set_steering(commands.steering)
+        crawler.set_motor(controller.get_input(controller.r2))
+        crawler.set_steering(controller.get_input_axis()['x'])
+        crawler.send_instructions()
 
 finally:
-    if NETWORK_ENABLED:
-        connection.close()
-        client.close()
-        print 'Disconnected from %s:%d' % (HOST, PORT)
+    network.finish()
     controller.disconnect()
     crawler.disconnect()
