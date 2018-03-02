@@ -2,9 +2,12 @@
 import pygame
 
 class DS4:
-    name = None
     joystick = None
-
+    name = None
+    axis_count = 0
+    axis = {}
+    buttons = {}
+    
     SQUARE = 0
     X = 1
     CIRCLE = 2
@@ -14,8 +17,10 @@ class DS4:
     L2 = 6
     R2 = 7
 
-    X_AXIS = 3
-    Y_AXIS = 4
+    LEFT_X_AXIS = 0
+    LEFT_Y_AXIS = 1
+    RIGHT_X_AXIS = 2
+    LEFT_Y_AXIS = 3
 
 
     def connect(self):
@@ -24,37 +29,21 @@ class DS4:
         self.joystick = pygame.joystick.Joystick(0)
         self.joystick.init()
         self.name = self.joystick.get_name()
+        self.axis_count = self.joystick.get_numaxes()
+        for i in range (0,self.axis_count):
+            self.axis[i] = 0.0
+   
 
-    def get_input(self, button):
+    def get_button(self, button):
         return self.joystick.get_button(button)
 
 
-    def get_input_buttons(self):
-        return {
-            'square' : self.joystick.get_button(self.SQUARE),
-            'x' : self.joystick.get_button(self.X),
-            'circle' : self.joystick.get_button(self.CIRCLE),
-            'triangle' : self.joystick.get_button(self.TRIANGLE),
-            'l1' : self.joystick.get_button(self.L1),
-            'r1' : self.joystick.get_button(self.R1),
-            'l2' : self.joystick.get_button(self.L2),
-            'r2' : self.joystick.get_button(self.R2),
-        }
-
-
-    def get_input_axis(self):
-        axis = {}
-        axis[X_AXIS] = 0.0
-        axis[Y_AXIS] = 0.0
+    def get_axis(self):
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
-                axis[event.axis] = round(event.value, 2)
-
-        return {
-            'x' : axis['X_AXIS'],
-            'y' : axis['Y_AXIS'],
-        }
-
+                self.axis[event.axis] = round(event.value, 2)     
+        return self.axis
+        
 
     def disconnect(self):
         pygame.quit()

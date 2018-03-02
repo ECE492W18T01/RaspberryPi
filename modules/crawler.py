@@ -39,6 +39,6 @@ class Crawler:
         try:
             port.write("%d, %d") % (self.motor, self.steering)
             recieved = port.read(READ_SIZE)
-            print "Recieved" , recieved
+            print("Recieved")
         except TimeoutError():
-            print "Timeout occured"
+            print("Timeout occured")

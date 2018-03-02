@@ -1,4 +1,4 @@
-from picamera import PiCamera
+#from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
 from modules.crawler import Crawler
@@ -35,17 +35,15 @@ def crawler_test():
 
 
 def controller_test():
-    print "Controller test started..."
+    print("Controller test started..")
     controller = DS4()
     controller.connect()
     print(controller.name)
     testing = True
     try:
         while testing:
-            buttons = controller.get_input_buttons()
-            print(buttons)
-            axis = controller.get_input_axis()
-            print(axis)
+            print("R2: ", controller.get_button(controller.R2))
+            print("x: ", controller.get_axis()[controller.LEFT_X_AXIS], "\n")
             sleep(0.2)
 
     except KeyboardInterrupt:
@@ -53,7 +51,7 @@ def controller_test():
 
     finally:
         controller.disconnect()
-        print "Controller test ended."
+        print("Controller test ended.")
 
 
 def camera_preview():
@@ -70,7 +68,8 @@ def serial_test():
             port.write("Testing...")
             time.sleep(1)
             recieved = port.read(10)
-            print "Recieved" , recieved
-
+            print("Recieved")
+    finally:
+        print("Completed serial test.")
 
 controller_test()
