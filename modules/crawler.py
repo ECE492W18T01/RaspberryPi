@@ -22,6 +22,9 @@ class Crawler:
 
     battery = 0
 
+    def __init__(self):
+        return self
+
     def connect(self):
         try:
             port = serial.Serial("/dev/serial0", baudrate=self.BAUDRATE, timeout=self.TIMEOUT)
@@ -29,7 +32,6 @@ class Crawler:
             break
         except TimeoutError():
             print("Cannot connect to crawler")
-
 
     def set_motor(self, mode):
         self.motor = mode
