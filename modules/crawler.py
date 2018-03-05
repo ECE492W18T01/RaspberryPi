@@ -23,9 +23,13 @@ class Crawler:
     }
 
     battery = 0
-
-    def __init__(self):
-        return self
+    
+    def info(self):
+        return {
+            'baudrate' : self.BAUDRATE,
+            'motor' : self.motor,
+            'wheels' : self.wheels
+            }
 
     def connect(self):
         self.port = serial.Serial("/dev/serial0", baudrate=self.BAUDRATE, timeout=self.TIMEOUT)
