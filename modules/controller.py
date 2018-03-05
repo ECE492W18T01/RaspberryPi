@@ -7,7 +7,7 @@ class DS4:
     axis_count = 0
     axis = {}
     buttons = {}
-    
+
     SQUARE = 0
     X = 1
     CIRCLE = 2
@@ -32,7 +32,7 @@ class DS4:
         self.axis_count = self.joystick.get_numaxes()
         for i in range (0,self.axis_count):
             self.axis[i] = 0.0
-   
+
 
     def get_button(self, button):
         return self.joystick.get_button(button)
@@ -41,9 +41,9 @@ class DS4:
     def get_axis(self):
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
-                self.axis[event.axis] = round(event.value, 2)     
+                self.axis[event.axis] = round(event.value, 2)
         return self.axis
-        
+
 
     def disconnect(self):
         pygame.quit()

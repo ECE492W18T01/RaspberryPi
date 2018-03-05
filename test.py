@@ -2,8 +2,9 @@
 from time import sleep
 from modules.controller import DS4
 from modules.crawler import Crawler
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import serial
+import requests
 
 
 def gpio_test():
@@ -73,4 +74,8 @@ def serial_test():
     finally:
         print("Completed serial test.")
 
-controller_test()
+def request_test():
+    UPDATE_URL = "http://192.168.0.4:8080/api/update/"
+    r = requests.post(UPDATE_URL, data={'crawler': 'crawler data here'})
+
+request_test()

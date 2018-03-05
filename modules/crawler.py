@@ -1,5 +1,5 @@
 #Crawler class
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import serial
 
 class Crawler:
@@ -9,7 +9,7 @@ class Crawler:
     BAUDRATE = 11520
     TIMEOUT = 3.0
     READ_SIZE = 10
-    
+
     port = None
 
     motor = 0
