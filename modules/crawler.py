@@ -9,6 +9,8 @@ class Crawler:
     BAUDRATE = 11520
     TIMEOUT = 3.0
     READ_SIZE = 10
+    
+    port = None
 
     motor = 0
     steering = CENTER
@@ -26,12 +28,8 @@ class Crawler:
         return self
 
     def connect(self):
-        try:
-            port = serial.Serial("/dev/serial0", baudrate=self.BAUDRATE, timeout=self.TIMEOUT)
-            print('Crawler connected on serial0')
-            break
-        except TimeoutError():
-            print("Cannot connect to crawler")
+        self.port = serial.Serial("/dev/serial0", baudrate=self.BAUDRATE, timeout=self.TIMEOUT)
+        print('Crawler connected on serial0')
 
     def set_motor(self, mode):
         self.motor = mode
@@ -42,9 +40,6 @@ class Crawler:
 
 
     def send_instructions(self):
-        try:
-            port.write("%d, %d") % (self.motor, self.steering)
-            recieved = port.read(READ_SIZE)
-            print("Recieved")
-        except TimeoutError():
-            print("Timeout occured")
+        self.port.write("%d, %d") % (self.motor, self.steering)
+        recieved = self.port.read(READ_SIZE)
+        print("Recieved")
