@@ -1,4 +1,4 @@
-#from picamera import PiCamera
+from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
 from modules.crawler import Crawler
@@ -78,4 +78,4 @@ def request_test():
     UPDATE_URL = "http://192.168.0.4:8080/api/update/"
     r = requests.post(UPDATE_URL, data={'crawler': 'crawler data here'})
 
-request_test()
+camera_preview()
