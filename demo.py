@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-from modules.controller import DS4
-from modules.crawler import Crawler
-from modules.network import Network
-=======
 ''' IO Demo Script
 
 Used during IO demonstration. Demonstrates the following:
@@ -17,7 +12,6 @@ TODO:
 from module.controller import DS4
 from module.crawler import Crawler
 from module.network import Network
->>>>>>> 2fffcd999ee4fd479749b80e76329711db53cb90
 from picamera import PiCamera
 from time import sleep
 

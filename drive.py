@@ -50,12 +50,8 @@ class getInstructions(threading.Thread):
         while True:
             crawler.set_motor(controller.get_button(controller.R2))
             crawler.set_steering(controller.get_axis()[controller.LEFT_X_AXIS])
-<<<<<<< HEAD
             #crawler.send_instructions()
             print("Crawler info: %o" ,crawler.info())
-=======
-            crawler.send_instructions()
->>>>>>> 2fffcd999ee4fd479749b80e76329711db53cb90
             time.sleep(1/self.frequency)
 
 instruction_thread = getInstructions('Instruction Thread', INSTRUCTION_POLL_FREQUENCY)
