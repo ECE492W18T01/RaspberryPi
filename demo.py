@@ -1,3 +1,14 @@
+''' IO Demo Script
+
+Used during IO demonstration. Demonstrates the following:
+- 20 second camera preview. Requires a monitor be connected to the Raspberry Pi.
+- 20 second controller preview. Requires the dualshock 4 controller to be connected.
+
+TODO:
+- Add web streaming to demo (optional).
+- Add crawler communication to demo (optional).
+'''
+
 from module.controller import DS4
 from module.crawler import Crawler
 from module.network import Network

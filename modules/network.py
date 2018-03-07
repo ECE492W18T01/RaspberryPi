@@ -1,5 +1,10 @@
-#Network module
-#Currently unused
+''' Network module
+
+Currently unused by the application.
+
+TODO:
+- implement high level streaming class (optional).
+'''
 
 class Network:
     enable = False

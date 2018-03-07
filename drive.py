@@ -1,5 +1,11 @@
-'''
-Main program used for driving the crawler using the dualshock 4 controller. Will be implementing a queue/messaging system for the threads to exchange data.
+''' Drive
+
+Main program used for driving the crawler using the dualshock 4 controller.
+
+TODO:
+- Implement a queue/messaging system for the threads to exchange data.
+- Set variables using configuration file.
+- Implement threading classes in seperate module (optional).
 '''
 
 import io
