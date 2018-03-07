@@ -2,7 +2,6 @@ import io
 import picamera
 import logging
 import socketserver
-#import numpy
 from threading import Condition
 from http import server
 
@@ -12,12 +11,6 @@ FORMAT = 'mjpeg'
 
 URL = '0.0.0.0'
 PORT = 8080
-
-'''
-a = numpy.zeros((480, 640, 3), dtype=numpy.uint8)
-a[240, :, :] = 0xff
-a[:, 320, :] = 0xff
-'''
 
 class StreamingOutput(object):
     def __init__(self):
@@ -69,10 +62,10 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
 with picamera.PiCamera(resolution=RESOLUTION, framerate=FRAMERATE) as camera:
     output = StreamingOutput()
     camera.start_recording(output, format=FORMAT)
-    #o = camera.add_overlay(numpy.getbuffer(a), layer=3, alpha=64)
     try:
         address = ('', PORT)
         server = StreamingServer(address, StreamingHandler)
+        print("Listening at '0.0.0.0:8080/stream.mjpg'")
         server.serve_forever()
     finally:
         camera.stop_recording()
