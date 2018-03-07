@@ -1,5 +1,6 @@
-#Crawler class
-#import RPi.GPIO as GPIO
+#Crawler module
+#Serves as high-level crawler interface
+
 import serial
 
 class Crawler:
@@ -23,7 +24,7 @@ class Crawler:
     }
 
     battery = 0
-    
+
     def info(self):
         return {
             'baudrate' : self.BAUDRATE,

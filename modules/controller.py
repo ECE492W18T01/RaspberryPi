@@ -1,4 +1,6 @@
-#Dualshock 4 class
+#Controller module
+#Currently implements a Dualshock 4 class
+
 import pygame
 
 class DS4:

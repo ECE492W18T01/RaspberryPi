@@ -1,29 +1,12 @@
-#from picamera import PiCamera
+'''
+'''
+
+from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
 from modules.crawler import Crawler
-#import RPi.GPIO as GPIO
 import serial
 import requests
-
-
-def gpio_test():
-    output_pin = 24
-    ON = 1
-    OFF = 0
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(output_pin, GPIO.OUT)
-
-    try:
-        while True:
-            GPIO.output(output_pin, ON)
-            sleep(0.5)
-            GPIO.output(output_pin, OFF)
-            sleep(0.5)
-
-    except KeyboardInterrupt:
-        GPIO.cleanup()
-
 
 def crawler_test():
     crawler = Crawler()
@@ -57,10 +40,12 @@ def controller_test():
 
 
 def camera_preview():
+    print("Camera preview Started, please have monitor connected..")
     camera = PiCamera()
     camera.start_preview()
     sleep(10)
     camera.stop_preview()
+    print("Camera preview has ended.")
 
 
 def serial_test():
@@ -77,5 +62,3 @@ def serial_test():
 def request_test():
     UPDATE_URL = "http://192.168.0.4:8080/api/update/"
     r = requests.post(UPDATE_URL, data={'crawler': 'crawler data here'})
-
-request_test()

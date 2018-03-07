@@ -1,4 +1,5 @@
-#Network Class
+#Network module
+#Currently unused
 
 class Network:
     enable = False
@@ -6,7 +7,7 @@ class Network:
     port = 8080
     connection = None
     client = None
-    
+
 
     def connect(self):
         if self.enable:
