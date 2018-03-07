@@ -1,3 +1,5 @@
+# Raspbian Setup
+
 sudo apt-get update
 sudo apt-get upgrade
 
@@ -8,7 +10,6 @@ sudo apt-get -y install joystick
 
 sudo pip3 install ds4drv
 
-#Update rules
 sudo wget https://raw.githubusercontent.com/chrippa/ds4drv/master/udev/50-ds4drv.rules -O /etc/udev/rules.d/50-ds4drv.rules
 sudo udevadm control --reload-rules
 sudo udevadm trigger

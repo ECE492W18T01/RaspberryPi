@@ -1,3 +1,12 @@
+''' Joystick
+
+Taken from Pygame.joystick documentation.
+
+Useful for checking the connection of a bluetooth joystick. Unused in final application.
+
+Pygame Joystick example code: https://www.pygame.org/docs/ref/joystick.html
+'''
+
 import pygame
 
 # Define some colors

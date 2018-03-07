@@ -1,31 +1,21 @@
+''' Test
+Crawler and peripheral testing.
+
+TODO:
+- Finish writing test cases.
+- Automate testing using unit testing modules (optional).
+- Implement logging system to log all testing information (optional).
+'''
+
 from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
 from modules.crawler import Crawler
-#import RPi.GPIO as GPIO
 import serial
 import requests
 
-
-def gpio_test():
-    output_pin = 24
-    ON = 1
-    OFF = 0
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(output_pin, GPIO.OUT)
-
-    try:
-        while True:
-            GPIO.output(output_pin, ON)
-            sleep(0.5)
-            GPIO.output(output_pin, OFF)
-            sleep(0.5)
-
-    except KeyboardInterrupt:
-        GPIO.cleanup()
-
-
 def crawler_test():
+    ''' Attempts to connect with the crawler and send instructions. '''
     crawler = Crawler()
     try:
         crawler.connect()
@@ -37,6 +27,7 @@ def crawler_test():
 
 
 def controller_test():
+    ''' Polls connected bluetooth controller for some amount of time '''
     print("Controller test started..")
     controller = DS4()
     controller.connect()
@@ -57,13 +48,17 @@ def controller_test():
 
 
 def camera_preview():
+    ''' Quick picamera preview '''
+    print("Camera preview Started, please have monitor connected..")
     camera = PiCamera()
     camera.start_preview()
     sleep(10)
     camera.stop_preview()
+    print("Camera preview has ended.")
 
 
 def serial_test():
+    ''' Serial test used to ensure proper setup between de10 and RPI '''
     port = serial.Serial("/dev/serial0", baudrate=115200, timeout=3.0)
     try:
         while True:
@@ -75,7 +70,6 @@ def serial_test():
         print("Completed serial test.")
 
 def request_test():
+    ''' API update test '''
     UPDATE_URL = "http://192.168.0.4:8080/api/update/"
     r = requests.post(UPDATE_URL, data={'crawler': 'crawler data here'})
-
-camera_preview()

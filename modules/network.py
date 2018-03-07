@@ -1,4 +1,10 @@
-#Network Class
+''' Network module
+
+Currently unused by the application.
+
+TODO:
+- implement high level streaming class (optional).
+'''
 
 class Network:
     enable = False
@@ -6,7 +12,7 @@ class Network:
     port = 8080
     connection = None
     client = None
-    
+
 
     def connect(self):
         if self.enable:

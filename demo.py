@@ -1,6 +1,23 @@
+<<<<<<< HEAD
 from modules.controller import DS4
 from modules.crawler import Crawler
 from modules.network import Network
+=======
+''' IO Demo Script
+
+Used during IO demonstration. Demonstrates the following:
+- 20 second camera preview. Requires a monitor be connected to the Raspberry Pi.
+- 20 second controller preview. Requires the dualshock 4 controller to be connected.
+
+TODO:
+- Add web streaming to demo (optional).
+- Add crawler communication to demo (optional).
+'''
+
+from module.controller import DS4
+from module.crawler import Crawler
+from module.network import Network
+>>>>>>> 2fffcd999ee4fd479749b80e76329711db53cb90
 from picamera import PiCamera
 from time import sleep
 

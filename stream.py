@@ -1,4 +1,14 @@
-import io
+''' Stream
+Stream camera data on Raspberry Pi.
+
+TODO:
+- Create HUD overlay for stream (optional).
+- Send stream to server and have the server host the feed (optional).
+- Implement object recognition system (optional).
+'''
+
+import socket
+import time
 import picamera
 import logging
 import socketserver
