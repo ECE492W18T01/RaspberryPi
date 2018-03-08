@@ -46,7 +46,6 @@ As daemon:
 sudo ds4drv &
 ```
 3. Pair bluetooth controller to the device:
-You can test that the device is properly connected by running utilities/joystick.py
 
 ## Running the application:
 1. Run drive.py from the RaspberryPi directory:
@@ -55,4 +54,3 @@ python drive.py
 ```
 Currently the main program is broken up into two seperate processes drive.py and stream.py. These two files will be combined into the main program once testing is complete.
 
-Has seperate master and progress branch.
