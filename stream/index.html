@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>STC</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/stc.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+</head>
+
+<body>
+
+
+<div id="centervid">
+<div id= "topcenter" class="container p-3 mb-2 bg-dark" style="height:140px;width:1010px;",>
+	<h1 style="color:LimeGreen;">Smart Tank Crawler</h1>
+	<input type="button" class="btn btn-success" value="Check out our Github!" onclick="location.href = 'https://github.com/ECE492W18T01';">
+	<img src="/images/githublogo.png" width="100" height="30">
+	<img src="/images/github.png" width="30" height="30">
+	<div id="time", style="position:absolute;color:white; top:80%; left:90%;"></div>
+</div>
+
+<canvas id="drawlines" style="background:#4169E1;height:300px;width:200px;position:absolute; top: 0%;left: -40%;"></canvas>
+<wheel style="background:#98bf21;height:75px;width:75px;position:absolute; top: 0%;left: -40%;"></wheel>
+<div style="background:#98bf21;height:75px;width:75px;position:absolute; top: 0%;left: -17.7%;"></div>
+<div style="background:#98bf21;height:75px;width:75px;position:absolute; top: 61.4%;left: -40%;"></div>
+<div style="background:#98bf21;height:75px;width:75px;position:absolute; top: 61.4%;left: -17.7%;"></div>
+
+<i id="batteryPosition" class="fa fa-battery-4" style="font-size:80px;color:green;"></i>
+
+	<div id="videotext"><h2 style="color:LimeGreen">Video Feed</h2></div>
+	<div id ="sonar"><h2 style="color:Black">Sonar:</h2></div>
+	<div id ="sonaroutput"><h2 id = "sonarStatus"; style="color:Black"></h2></div>
+  	<iframe id="feed" src=“http://192.168.0.15:8080/stream.mjpg” type="video/mp4" width="560" height="360" style="padding:1px;border:1px solid black;"></iframe>
+	<div id="group"><img src="/images/picture.jpg" height="155" width="560"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="/js/functionUpdates.js"></script>
+</body>
+</html>
