@@ -4,12 +4,14 @@ import logging
 import socketserver
 from threading import Condition
 from http import server
+from io import BytesIO
 
+stream_path = '/stream.mjpg'
 
-class StreamingOutput(object):
+class Output(object):
     def __init__(self):
         self.frame = None
-        self.buffer = io.BytesIO()
+        self.buffer = BytesIO()
         self.condition = Condition()
 
     def write(self, buf):
@@ -21,9 +23,11 @@ class StreamingOutput(object):
             self.buffer.seek(0)
         return self.buffer.write(buf)
 
-class StreamingHandler(server.BaseHTTPRequestHandler):
+class Handler(server.BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path == '/stream.mjpg':
+        print('Get called')
+        if self.path == stream_path:
+            print(stream_path)
             self.send_response(200)
             self.send_header('Age', 0)
             self.send_header('Cache-Control', 'no-cache, private')
@@ -49,6 +53,6 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_error(404)
             self.end_headers()
 
-class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
+class Server(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
