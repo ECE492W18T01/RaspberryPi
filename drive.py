@@ -18,6 +18,7 @@ import threading
 from modules.controller import DS4
 from modules.crawler import Crawler
 
+#AWS_URL = "http://crawler.us-west-2.elasticbeanstalk.com/api/update/"
 SERVER_URL = "http://192.168.0.4:8080/api/update/"
 API_UPDATE = SERVER_URL + "/api/update/"
 INSTRUCTION_POLL_FREQUENCY = 10
