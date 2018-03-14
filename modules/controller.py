@@ -21,6 +21,7 @@ class DS4:
     axes = {}
     buttons = {}
 
+
     SQUARE = 0
     X = 1
     CIRCLE = 2
@@ -33,7 +34,7 @@ class DS4:
     LEFT_X_AXIS = 0
     LEFT_Y_AXIS = 1
     RIGHT_X_AXIS = 2
-    LEFT_Y_AXIS = 3
+    RIGHT_Y_AXIS = 3
 
 
     def connect(self):
@@ -43,12 +44,12 @@ class DS4:
         self.joystick = pygame.joystick.Joystick(0)
         self.joystick.init()
         self.name = self.joystick.get_name()
-        self.axis_count = self.joystick.get_numaxes()
+        self.axes_count = self.joystick.get_numaxes()
         for i in range (0,self.axes_count):
             self.axes[i] = 0.0
 
 
-    def get_button(self, button=self.R2):
+    def get_button(self, button):
         ''' Return the value of button from the controller.
 
         Keyword arguments:

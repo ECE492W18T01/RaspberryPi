@@ -17,14 +17,23 @@ import requests
 def crawler_test():
     ''' Attempts to connect with the crawler and send instructions. '''
     crawler = Crawler()
+    controller = DS4()
     try:
+        controller.connect()
         crawler.connect()
-        crawler.set_motor(1)
-        crawler.set_steering(1)
-        crawler.send_instructions()
+        while True:
+            print('.')
+            r2 = controller.get_button(controller.R2)
+            x = controller.get_axes()[controller.LEFT_X_AXIS]
+            crawler.set_motor(r2)
+            crawler.set_steering(x)
+            crawler.send_instructions()
+            sleep(0.2)
     finally:
-        crawler.disconnect()
+        #crawler.disconnect()
+        controller.disconnect()
 
+crawler_test()
 
 def controller_test():
     ''' Polls connected bluetooth controller for some amount of time '''
@@ -36,7 +45,7 @@ def controller_test():
     try:
         while testing:
             print("R2: ", controller.get_button(controller.R2))
-            print("X: ", controller.get_axis()[controller.LEFT_X_AXIS], "\n")
+            print("X: ", controller.get_axes()[controller.LEFT_X_AXIS])
             sleep(0.2)
 
     except KeyboardInterrupt:
@@ -45,6 +54,7 @@ def controller_test():
     finally:
         controller.disconnect()
         print("Controller test ended.")
+
 
 
 def camera_preview():
@@ -59,15 +69,20 @@ def camera_preview():
 
 def serial_test():
     ''' Serial test used to ensure proper setup between de10 and RPI '''
-    port = serial.Serial("/dev/serial0", baudrate=115200, timeout=3.0)
+    device = '/dev/ttyUSB0'
+    port = serial.Serial(device, baudrate=115200, timeout=3.0)
     try:
         while True:
-            port.write("Testing...")
-            time.sleep(1)
-            recieved = port.read(10)
-            print("Recieved")
+            port.write('Testing.\r')
+            sleep(1)
+            
+    except KeyboardInterrupt:
+        print("Ending session.")
+        
     finally:
+        port.close()
         print("Completed serial test.")
+        
 
 def request_test():
     ''' API update test '''
