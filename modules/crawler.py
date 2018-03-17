@@ -13,14 +13,14 @@ class Crawler(threading.Thread):
     OFF = 0
     CENTER = 0.0
 
+    connected = 0
     status = {
-        connected = 0,
-        mode = 0
-        motors = 0.0,
-        steering = CENTER,
-        battery = 0,
+        'mode' : 0,
+        'motors' : 0.0,
+        'steering' : CENTER,
+        'battery' : 0,
 
-        wheels = {
+        'wheels' : {
             'fl' : 0,
             'fr' : 0,
             'rl' : 0,
@@ -29,32 +29,28 @@ class Crawler(threading.Thread):
     }
 
     messages = {
-        connect = "S\r",
-        disconnect = "E\r"
+        'connect' : "S\r",
+        'disconnect' : "E\r"
     }
 
     instructions = {
-        motor = OFF
-        steering = CENTER
-        brake = OFF
+        'motor' : OFF,
+        'steering' : CENTER,
+        'brake' : OFF
     }
 
     recieved = {}
-
+    
+    port = None
     comm = {
-        baudrate = 115200,
-        timeout = 3.0,
-        read_size = 10,
-        instruction_freq = 10
-        connect_freq = 1
-        device = '/dev/ttyUSB0',
-        port = None,
+        "baudrate" : 115200,
+        "timeout" : 3.0,
+        "read_size" : 10,
+        "instruction_freq" : 10,
+        "connect_freq" : 1/10,
+        "device" : '/dev/ttyUSB0', 
     }
 
-    def __init__(self, name):
-        threading.Thread.__init__(self)
-        self.name = name
-        self.comm.port = serial.Serial(self.comm.device, baudrate=self.comm.baudrate, timeout=self.comm.timeout)
 
     def run(self):
         while True:
@@ -66,8 +62,8 @@ class Crawler(threading.Thread):
                 if self.recieved == self.comm.end:
                     self.connect = 0
                 '''
-                sleep(1/self.comm.instruction_freq)
-            sleep(1/self.comm.connect_freq)
+                sleep(1/self.comm['instruction_freq'])
+            sleep(1/self.comm['connect_freq'])
 
     def info(self):
         ''' Return dictionary of Crawler status. '''
@@ -78,9 +74,15 @@ class Crawler(threading.Thread):
 
     def connect(self):
         ''' Establish serial connection with DE10 '''
-        self.comm.port.write(self.messages.start.encode())
-        self.connected = 1
-        print('Crawler connected on ', self.comm.device)
+        try:
+            self.port = serial.Serial(self.comm['device'], baudrate=self.comm['baudrate'], timeout=self.comm['timeout'])
+            self.port.write(self.messages['start'].encode())
+            self.recieved['message'] = self.port.read(self.comm['read_size'])
+            
+            self.connected = 1 
+            print('Crawler connected on ', self.comm['device'])
+        except:
+            print("Can't connect to Crawler. Make sure device is connected.")
 
     def disconnect(self):
         ''' Disconnect from DE10 '''
@@ -90,22 +92,34 @@ class Crawler(threading.Thread):
 
     def clear_instructions(self):
         ''' Clear all instructions '''
-        self.instructions.motor = OFF
-        self.instructions.steering = CENTER
+        self.instructions['motor'] = self.CENTER
+        self.instructions['steering'] = self.CENTER
+        self.instructions['brake'] = self.OFF
 
-    def set_motor_instruction(self, motors):
+    def set_motor_instruction(self, motor):
         ''' Set the desired motor for the crawler motor. '''
-        self.instructions.motors = str(motors)
+        self.instructions['motor'] = str(-1*motor)
 
     def set_steering_instruction(self, x_axis):
         ''' Set desired steering instruction. '''
-        self.instructions.steering = str(x_axis * 60)
+        self.instructions['steering'] = str(x_axis * 60)
+        
+    def set_brake_instruction(self, brake):
+        ''' Set desired brake instruction. '''
+        self.instructions['brake'] = str(brake)
 
     def send_instructions(self):
         ''' Send instructions via the connected serial port. '''
-        instructions = self.instructions.motor. + ',' + self.instructions.steering + '\r'.encode()
-        self.comm.port.write(instructions)
+        instructions = self.instructions['motor'] + ',' + self.instructions['steering'] + '\r'.encode()
+        self.port.write(instructions)
+        clear_instructions()
 
     def recieve_instruction(self):
         ''' Recieve message from de10 '''
-        self.recieved.message = self.comm.port.read(self.comm.read_size)
+        self.recieved['message'] = self.port.read(self.comm['read_size'])
+        
+    def is_connected(self):
+        if self.connected == 1:
+            return True
+        else:
+            return False

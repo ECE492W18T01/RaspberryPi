@@ -23,11 +23,11 @@ def crawler_test():
         crawler.connect()
         while True:
             print('.')
-            r2 = controller.get_button(controller.R2)
-            x = controller.get_axes()[controller.LEFT_X_AXIS]
-            crawler.set_motor(r2)
-            crawler.set_steering(x)
-            crawler.send_instructions()
+            crawler.set_motor_instruction(controller.get_axes()[controller.RIGHT_Y_AXIS])
+            crawler.set_steering_instruction(controller.get_axes()[controller.LEFT_X_AXIS])
+            #print(controller.axes)
+            print(crawler.instructions)
+            #crawler.send_instructions()
             sleep(0.2)
     finally:
         #crawler.disconnect()
