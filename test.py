@@ -33,7 +33,7 @@ def crawler_test():
         #crawler.disconnect()
         controller.disconnect()
 
-crawler_test()
+#crawler_test()
 
 def controller_test():
     ''' Polls connected bluetooth controller for some amount of time '''
@@ -73,7 +73,7 @@ def serial_test():
     port = serial.Serial(device, baudrate=115200, timeout=3.0)
     try:
         while True:
-            port.write('Testing.\r')
+            port.write('*'.encode())
             sleep(1)
             
     except KeyboardInterrupt:
@@ -82,7 +82,8 @@ def serial_test():
     finally:
         port.close()
         print("Completed serial test.")
-        
+
+serial_test()
 
 def request_test():
     ''' API update test '''

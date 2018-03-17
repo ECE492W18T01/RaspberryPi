@@ -41,15 +41,19 @@ class updateAPI(threading.Thread):
                 sleep(1/self.frequency)
             except:
                 print("Failed to POST to ", URL)
-                sleep(1/self.frequency * 10)
+                sleep(10)
 
 
 class Drive(threading.Thread):
-    def __init__(self, name, frequency):
+    
+    def __init__(self, name):
         threading.Thread.__init__(self)
         self.name = name
-        self.frequency = frequency
         self.controller = DS4()
+        self.throttle_input = self.controller.RIGHT_Y_AXIS
+        self.steering_input = self.controller.LEFT_X_AXIS
+        self.brake_input = self.controller.L2
+        self.end = self.controller.SHARE
 
     def run(self):
         while True:
@@ -58,7 +62,7 @@ class Drive(threading.Thread):
                 crawler.connect()
                 while crawler.is_connected():
                     self.get_instructions()
-                    crawler.send_instruction()
+                    crawler.send_instructions()
                     ''' Recieving instructions
                     crawler.recieve_instruction()
                     if crawler.recieved == crawler.comm.end:
@@ -68,16 +72,22 @@ class Drive(threading.Thread):
                 sleep(1/crawler.comm['connect_freq'])
         
 
-    def get_instructions():
-            enabled = self.controller.get_button(controller.R2)
-            if enabled == 1:
-                crawler.set_motor_instruction(self.controller.get_axes()[self.controller.RIGHT_Y_AXIS])
-                crawler.set_steering_instruction(self.controller.get_axes()[self.controller.LEFT_X_AXIS])
-                print("Crawler info: %o" ,crawler.info())
+    def get_instructions(self):
+            enabled = self.controller.get_button(self.controller.R2)
+            crawler.set_motor_instruction(self.controller.get_axes()[self.throttle_input])
+            crawler.set_steering_instruction(self.controller.get_axes()[self.steering_input])
+            crawler.set_brake_instruction(self.controller.get_button(self.brake_input))
+            '''
+            end = self.controller.get_button(self.end)
+            print(end)
+            if end == 1:
+                crawler.disconnect()
+            '''
 
 
 
-crawler_thread = Drive('Crawler Thread', INSTRUCTION_POLL_FREQUENCY)
+
+crawler_thread = Drive('Crawler Thread')
 network_thread = updateAPI('Network Thread', SERVER_UPDATE_FREQUENCY)
 
 crawler_thread.start()

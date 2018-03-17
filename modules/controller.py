@@ -25,6 +25,7 @@ class DS4:
 
     CONNECT_FREQUENCY = 1/10
 
+    ''' PS4 buttons indices '''
     SQUARE = 0
     X = 1
     CIRCLE = 2
@@ -33,7 +34,14 @@ class DS4:
     R1 = 5
     L2 = 6
     R2 = 7
-
+    SHARE = 8
+    OPTIONS = 9
+    LEFT_ANALOG_PRESS = 10
+    RIGHT_ANALOG_PRESS = 11
+    PS4_ON_BUTTON = 12
+    TOUCHPAD = 13
+    
+    ''' PS4 Axes indices '''
     LEFT_X_AXIS = 0
     LEFT_Y_AXIS = 1
     RIGHT_X_AXIS = 2
