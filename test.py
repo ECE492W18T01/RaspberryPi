@@ -7,33 +7,52 @@ TODO:
 - Implement logging system to log all testing information (optional).
 '''
 
-from picamera import PiCamera
+#from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
 from modules.crawler import Crawler
 import serial
 import requests
+import configparser
+import logging
+
 
 def crawler_test():
     ''' Attempts to connect with the crawler and send instructions. '''
-    crawler = Crawler()
-    controller = DS4()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger('Crawler Test')
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler('logs/drive.log')
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    crawler = Crawler(logger)
+    #print(config['COMMUNICATION']['Baudrate'])
+    crawler.configure_communication(config['COMMUNICATION'])
+
+    #controller = DS4()
     try:
-        controller.connect()
+        #controller.connect()
         crawler.connect()
+        crawler.configure_communication()
         while True:
             print('.')
-            crawler.set_motor_instruction(controller.get_axes()[controller.RIGHT_Y_AXIS])
-            crawler.set_steering_instruction(controller.get_axes()[controller.LEFT_X_AXIS])
+            #crawler.set_motor_instruction(controller.get_axes()[controller.RIGHT_Y_AXIS])
+            #crawler.set_steering_instruction(controller.get_axes()[controller.LEFT_X_AXIS])
             #print(controller.axes)
             print(crawler.instructions)
             #crawler.send_instructions()
             sleep(0.2)
     finally:
+        print('Crawler Test Done.')
         #crawler.disconnect()
-        controller.disconnect()
+        #controller.disconnect()
 
-#crawler_test()
+crawler_test()
 
 def controller_test():
     ''' Polls connected bluetooth controller for some amount of time '''
@@ -75,10 +94,10 @@ def serial_test():
         while True:
             port.write('*'.encode())
             sleep(1)
-            
+
     except KeyboardInterrupt:
         print("Ending session.")
-        
+
     finally:
         port.close()
         print("Completed serial test.")

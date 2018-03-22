@@ -12,10 +12,11 @@ TODO:
 - Implement controller disconnect procedure.
 '''
 
+import threading
 import pygame
 from time import sleep
 
-class DS4:
+class DS4(threading.Thread):
     joystick = None
     name = None
     axes_count = 0
@@ -40,12 +41,19 @@ class DS4:
     RIGHT_ANALOG_PRESS = 11
     PS4_ON_BUTTON = 12
     TOUCHPAD = 13
-    
+
     ''' PS4 Axes indices '''
     LEFT_X_AXIS = 0
     LEFT_Y_AXIS = 1
     RIGHT_X_AXIS = 2
     RIGHT_Y_AXIS = 5
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+
+
+    def run(self):
+        return True
 
 
     def connect(self):
@@ -60,10 +68,8 @@ class DS4:
             for i in range (0,self.axes_count):
                 self.axes[i] = 0.0
             self.connected = True
-            print(self.name, ' is connected.')
         except:
             self.connected = False
-            print('No controller connected.')
             sleep(10)
 
 
@@ -82,8 +88,8 @@ class DS4:
             if event.type == pygame.JOYAXISMOTION:
                 self.axes[event.axis] = round(event.value, 2)
         return self.axes
-    
-    
+
+
     def is_connected(self):
         return self.connected
 

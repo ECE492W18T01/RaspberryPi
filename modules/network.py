@@ -6,32 +6,33 @@ TODO:
 - implement high level streaming class (optional).
 '''
 
-class Network:
-    enable = False
-    host = 'localhost'
-    port = 8080
-    connection = None
-    client = None
+import threading
+import configparser
+from time import sleep
+import os
 
 
-    def connect(self):
-        if self.enable:
-            self.client = socket.socket()
-            print('Attempting to connect to %s:%d...') % (self.host, self.port)
-            self.client.connect((self.host, self.port))
-            self.connection = self.client.makefile('wb')
-            print('Connected.')
-        else:
-            print('Network is disabled. Try enabling first.')
+class Network(threading.Thread):
+    frequency = 0.5
+    timeout = 10
 
-    def send(self, data):
-        if self.enable:
-            print('Sending data...')
-        else:
-            print('Network is disabled. Try enabling first.')
+    def __init__(self, crawler, logger, config):
+        threading.Thread.__init__(self)
+        self.crawler = crawler
+        self.logger = logger
+        self.configure(config)
 
-    def finish(self):
-        if self.connection is not None:
-            self.connection.close()
-            self.client.close()
-            print('Disconnected from %s:%d.') % (self.host, self.port)
+    def configure(self, config):
+        self.url = config['Url']
+        self.api_update = self.url + config['ApiUpdate']
+        self.frequency = float(config['PostFrequency'])
+        self.timeout = float(config['Timeout'])
+
+    def run(self):
+        while True:
+            try:
+                r = requests.post(self.api_update, data={'crawler': self.crawler.info() })
+                sleep(1/self.frequency)
+            except:
+                self.logger.error(("Failed to POST to ", self.api_update))
+                sleep(self.timeout)
