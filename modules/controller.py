@@ -21,10 +21,12 @@ class DS4(threading.Thread):
     name = None
     axes_count = 0
     axes = {}
+    button_count = 0
     buttons = {}
     connected = False
 
     CONNECT_FREQUENCY = 1/10
+    POLL_FREQUENCY = 10
 
     ''' PS4 buttons indices '''
     SQUARE = 0
@@ -53,57 +55,64 @@ class DS4(threading.Thread):
 
 
     def run(self):
+        while True:
+            print('Trying to connect.')
+            self.connect()
+            while self.connected:
+                self.check_connection()
+                self.get_axes()
+                self.get_buttons()
+                sleep(1/self.POLL_FREQUENCY)
+                
+            sleep(1/self.CONNECT_FREQUENCY)
         return True
 
 
     def connect(self):
         ''' Initiate pygame and pygame.joystick module used for the controller. '''
         try:
+            pygame.quit()
             pygame.init()
             pygame.joystick.init()
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
             self.name = self.joystick.get_name()
+            
             self.axes_count = self.joystick.get_numaxes()
-            for i in range (0,self.axes_count):
+            for i in range (0, self.axes_count):
                 self.axes[i] = 0.0
+     
+            self.button_count = self.joystick.get_numbuttons()
+            for i in range (0, self.button_count):
+                self.buttons[i] = 0
             self.connected = True
             return True
         except:
             self.connected = False
-            sleep(10)
             return False
-
-
-    def get_button(self, button):
-        ''' Return the value of button from the controller.
-
-        Keyword arguments:
-        button -- integer value associated with dualshock 4 controller button (default=self.R2)
-        '''
-        button = 0
-        try:
-            button = self.joystick.get_button(button)
-        except:
-            print("Can't get button.")
-            self.connected = False
-        return button
+    
+    def get_buttons(self):
+        ''' Return the value for all buttons from the controller '''
+        for i in range(self.joystick.get_numbuttons()):
+            self.buttons[i] = self.joystick.get_button(i)
+        return self.buttons
 
 
     def get_axes(self):
         ''' Return the value of all axes from the controller. '''
-        try:
-            for event in pygame.event.get():
-                if event.type == pygame.JOYAXISMOTION:
-                    self.axes[event.axis] = round(event.value, 2)
-        except:
-            print("Can't get axes. Try reconnecting to controller.")
-            self.connected = True
+        for event in pygame.event.get():
+            if event.type == pygame.JOYAXISMOTION:
+                self.axes[event.axis] = round(event.value, 2)
         return self.axes
 
 
     def is_connected(self):
         return self.connected
+    
+    def check_connection(self):
+        ''' Check controller connection. Not working currently.'''
+        #print(pygame.joystick.Joystick(0))
+        return False
 
 
     def disconnect(self):

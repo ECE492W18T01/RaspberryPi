@@ -10,15 +10,37 @@ TODO:
 #from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
-from modules.crawler import Crawler
+from modules.controller import OutboundMessaging, InboundMessaging
+from crawler import Crawler
 import serial
 import requests
 import configparser
 import logging
 
+def outbound_test():
+    port = serial.Serial('dev/ttyUSB0', baudrate=115200, timeout=3.0)
+    message = ""
+    outbound_thread = OutboundMessaging(port, 0.1, message)
+    outbound_thread.start()
+    for i in range(30):
+        outbound_thread.set_message(i)
+        delay(1)
+
+#outbound_test()
+
+def inbound_test():
+    port = serial.Serial('dev/ttyUSB0', baudrate=115200, timeout=3.0)
+    message = ""
+    inbound_thread = InboundMessaging(port, 0.1, message)
+    inbound_thread.start()
+    for i in range(30):
+        outbound_thread.get_message()
+        delay(1)
+        
+#inbound_test()
 
 def crawler_test():
-    ''' Attempts to connect with the crawler and send instructions. '''
+    #Attempts to connect with the crawler and send instructions. 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger('Crawler Test')
     logger.setLevel(logging.INFO)
@@ -29,23 +51,22 @@ def crawler_test():
 
     config = configparser.ConfigParser()
     config.read('config.ini')
-
-    crawler = Crawler(logger)
-    #print(config['COMMUNICATION']['Baudrate'])
-    crawler.configure_communication(config['COMMUNICATION'])
-
+    crawler = Crawler(logger, config['COMMUNICATION'])
     controller = DS4()
     try:
         controller.connect()
+        #controller.start()
+        #controller.join()
         crawler.connect()
-        crawler.configure_communication()
         while True:
             print('.')
-            crawler.set_motor_instruction(controller.get_axes()[controller.RIGHT_Y_AXIS])
-            crawler.set_steering_instruction(controller.get_axes()[controller.LEFT_X_AXIS])
-            #print(controller.axes)
+            controller.get_buttons()
+            controller.get_axes()
+            crawler.set_motor_instruction(controller.axes[controller.RIGHT_Y_AXIS])
+            crawler.set_steering_instruction(controller.axes[controller.LEFT_X_AXIS])
+            crawler.set_brake_instruction(controller.buttons[controller.L2])
+            crawler.set_instruction_message()
             print(crawler.instructions)
-            #crawler.send_instructions()
             sleep(0.2)
     finally:
         print('Crawler Test Done.')
@@ -54,27 +75,32 @@ def crawler_test():
 
 #crawler_test()
 
+
 def controller_test():
     ''' Polls connected bluetooth controller for some amount of time '''
     print("Controller test started..")
     controller = DS4()
+    controller.run()
+    '''
     controller.connect()
     print(controller.name)
-    testing = True
+    print(controller.connected)
     try:
-        while testing:
+        while controller.is_connected():
             print("R2: ", controller.get_button(controller.R2))
             print("X: ", controller.get_axes()[controller.LEFT_X_AXIS])
-            sleep(0.2)
+            print(controller.connected)
+            sleep(0.5)
 
     except KeyboardInterrupt:
-        testing = False
+        controller.connected = False
 
     finally:
         controller.disconnect()
         print("Controller test ended.")
+        '''
 
-controller_test()
+#controller_test()
 
 
 

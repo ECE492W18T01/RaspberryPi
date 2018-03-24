@@ -17,9 +17,11 @@ from time import sleep
 import requests
 import sys
 import threading
+
 from modules.controller import DS4
-from modules.crawler import Crawler
 from modules.network import Network
+
+from crawler import Crawler
 
 
 class Drive(threading.Thread):
@@ -55,15 +57,17 @@ class Drive(threading.Thread):
             while True:
                 if self.controller.connect():
                     self.logger.debug('Controller connected.')
+                    print('Controller connected')
                 while self.controller.is_connected():
                     self.crawler.connect()
                     while self.crawler.is_connected():
                         #print('.')
                         self.set_instructions()
+                        self.crawler.set_instruction_message()
                         #self.crawler.send_instructions()
                         self.crawler.recieve_instruction()
-                        sleep(0.1)
-                    sleep(10)
+                        sleep(self.controller.POLL_FREQUENCY)
+                    sleep(self.controller.CONNECT_FREQUENCY)
                 self.logger.warning('No controller connected.')
         except KeyboardInterrupt:
             print('Shutting down')
@@ -75,9 +79,11 @@ class Drive(threading.Thread):
 
     def set_instructions(self):
         ''' Get instructions from the controller and send them to the Crawler. '''
-        enabled = self.controller.get_button(self.controller.R2)
-        self.crawler.set_motor_instruction(self.controller.get_axes()[self.throttle_input])
-        self.crawler.set_steering_instruction(self.controller.get_axes()[self.steering_input])
+        self.controller.get_buttons()
+        self.controller.get_axes()
+        enabled = self.controller.buttons(self.controller.R2)
+        self.crawler.set_motor_instruction(self.controller.axes[self.throttle_input])
+        self.crawler.set_steering_instruction(self.controller.axes[self.steering_input])
         #self.crawler.set_brake_instruction(self.controller.get_button(self.brake_input))
         #end = self.controller.get_button(self.end_input)
         '''
@@ -101,6 +107,5 @@ class Drive(threading.Thread):
         fh.setFormatter(format)
         self.logger.addHandler(fh)
 
-drive_thread = Drive()
-drive_thread.start()
-drive_thread.join()
+drive = Drive()
+drive.run()
