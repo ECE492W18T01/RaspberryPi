@@ -68,9 +68,11 @@ class DS4(threading.Thread):
             for i in range (0,self.axes_count):
                 self.axes[i] = 0.0
             self.connected = True
+            return True
         except:
             self.connected = False
             sleep(10)
+            return False
 
 
     def get_button(self, button):
