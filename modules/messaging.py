@@ -1,5 +1,6 @@
 import threading
-
+import serial
+from time import sleep
 
 class OutboundMessaging(threading.Thread):
     message = ""
@@ -10,6 +11,7 @@ class OutboundMessaging(threading.Thread):
         self.port = port
         self.frequency = frequency
         self.message = message
+        
 
     def run(self):
         while True:
@@ -20,14 +22,17 @@ class OutboundMessaging(threading.Thread):
                 print("Outbound messaging stopped working.")
                 status = False
             sleep(1/self.frequency)
+        
+
+    
+    def send_messsage(self):
+        print('hello')
+        self.port.write(this.message.encode())
         return True
     
-    def send_messsage(self, message):
-        self.port.write(message.encode())
-        return True
 
     def set_message(self, message):
-        this.message = message.encode()
+        self.message = message.encode()
         return True
     
     def get_status(self):
@@ -55,7 +60,6 @@ class InboundMessaging(threading.Thread):
                 print("Inbound message not recieved.")
                 self.status = False
             sleep(1/self.frequency)
-        return True
     
     def read_message(self):
         message = self.port.read(self.read_size)
@@ -68,13 +72,14 @@ class InboundMessaging(threading.Thread):
         return this.status
     
 class SerialMessaging():
-    connect = "*"
-    disconnect = "&"
-    acknowledgment = "@"
+    symbol = {
+        'connect': '*',
+        'disonnect': '&',
+        'ack': '@'
+    }
     port = None
-    
+    read_size = 256
     is_connected = False
-    
     
     def __init__(self, options, outbound, inbound):
         self.options = options
@@ -84,37 +89,50 @@ class SerialMessaging():
         
     def connect(self):
         ''' Attempt to create serial port for communication. '''
-        try:
-            self.port = serial.Serial(self.device, baudrate=self.baudrate, timeout=self.timeout)
-            self.outbound = OutboundMessaging(self.port, 0.1, outbound)
-            self.inbound = InboundMessaging(self.port, 0.2, inbound)
-            self.is_connected = True
-            return True
-        except:
-            print('Failed to create serial port. Check connection.')
-            self.is_connected = False
-            return False
+        self.port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=3.0)
+        #self.outbound = OutboundMessaging(self.port, 0.1, "")
+        #self.inbound = InboundMessaging(self.port, 0.2, "")
+        self.is_connected = True
+        return True
         
     def authorize(self):
         ''' Authorize communication with Crawler. '''
-        this.port.write(self.connect.encode())
-        sleep(0.1)
-        msg = this.port.read(128).decode()
+        print('Initializing communication.')
+        print(self.symbol['connect'])
+        self.port.write(str(self.symbol['connect']).encode())
+        #self.port.write('*')
+        sleep(0.5)
+        msg = self.port.read(self.read_size).decode()
+        print(msg)
+        '''
         if msg == self.acknowledgment:
             return True
         else:
             return False
+        '''
+        return True
         
     
     def disconnect(self):
-        if self.port is not None:
-            self.port.write(self.messages['disconnect'].encode())
-            self.port.disconnect()
+        #if self.port is not None:
+            #self.port.write(self.disconnect.encode())
+            #self.port.disconnect()
         return True
     
-    def start_communication():
-        self.outbound.start()
-        self.inbound.start()
+    def start_communication(self):
+        print('Starting communication.')
+        #self.outbound.start()
+        #self.outbound.join()
+        #self.inbound.start()
+        
+    def send_message(self):
+        self.port.write(self.outbound.encode())
+        return True
+        
+    def set_message(self, message):
+        print('set message')
+        self.outbound = message
+        return True
         
     def configure(self, options):
         self.baudrate = int(options['Baudrate'])

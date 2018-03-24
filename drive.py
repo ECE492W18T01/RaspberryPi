@@ -32,7 +32,7 @@ class Drive(threading.Thread):
         self.config.read('config.ini')
         self.initialize_logger()
         self.logger.info('Starting drive service.')
-        self.crawler = Crawler(self.logger, self.config['MESSAGES'], self.config['COMMUNICATION'])
+        self.crawler = Crawler(self.logger, self.config['COMMUNICATION'])
         self.controller = DS4()
         self.initialize_inputs()
 
@@ -51,8 +51,10 @@ class Drive(threading.Thread):
          '''
         print('Running..')
         print(self.crawler.info())
+        '''
         network_thread = Network(self.crawler, self.logger, self.config['NETWORK'])
         network_thread.start()
+        '''
         try:
             while True:
                 if self.controller.connect():
@@ -61,13 +63,14 @@ class Drive(threading.Thread):
                 while self.controller.is_connected():
                     self.crawler.connect()
                     while self.crawler.is_connected():
-                        #print('.')
+                        print('.')
                         self.set_instructions()
                         self.crawler.set_instruction_message()
+                        print(self.crawler.instructions)
                         #self.crawler.send_instructions()
-                        self.crawler.recieve_instruction()
-                        sleep(self.controller.POLL_FREQUENCY)
-                    sleep(self.controller.CONNECT_FREQUENCY)
+                        #self.crawler.recieve_instruction()
+                        sleep(1/self.controller.POLL_FREQUENCY)
+                    sleep(1/self.controller.CONNECT_FREQUENCY)
                 self.logger.warning('No controller connected.')
         except KeyboardInterrupt:
             print('Shutting down')
@@ -81,15 +84,9 @@ class Drive(threading.Thread):
         ''' Get instructions from the controller and send them to the Crawler. '''
         self.controller.get_buttons()
         self.controller.get_axes()
-        enabled = self.controller.buttons(self.controller.R2)
         self.crawler.set_motor_instruction(self.controller.axes[self.throttle_input])
         self.crawler.set_steering_instruction(self.controller.axes[self.steering_input])
-        #self.crawler.set_brake_instruction(self.controller.get_button(self.brake_input))
-        #end = self.controller.get_button(self.end_input)
-        '''
-        if end == 1:
-            crawler.disconnect()
-            '''
+
 
     def get_instructions(self):
         self.crawler.recieve_message()

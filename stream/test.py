@@ -8,8 +8,10 @@ from time import sleep
 from modules.stream import Stream, StreamHandler, StreamingServer
 from flask import Flask
 from PIL import Image
+from picamera import PiCamera
 
 
+'''
 
 stream = Stream()
 stream.start()
@@ -23,3 +25,8 @@ while True:
         print('Didnt work')
     finally:
         sleep(1)
+'''
+
+camera = PiCamera()
+camera.start_preview()
+sleep(2)

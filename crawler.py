@@ -44,20 +44,25 @@ class Crawler():
     def __init__(self, logger, options):
         self.logger = logger
         self.messaging = SerialMessaging(options, self.instructions['message'], self.recieved['message'])
-
+        print(self.messaging.outbound)
 
     def info(self):
         ''' Return dictionary of Crawler status. '''
         return {
             "status": self.status,
-            "comm": self.comm
         }
 
 
     def connect(self):
         ''' Establish serial connection with DE10. Initialize communication threads.'''
+        print('Trying to connect to crawler')
         if self.messaging.connect():
+            print('Created serial port.')
+            print(str(self.messaging.connect))
             self.connected = self.messaging.authorize()
+            #self.messaging.start_communication()
+            self.connected = True
+        return self.connected
             
             
     def disconnect(self):
@@ -94,22 +99,19 @@ class Crawler():
 
     def set_instruction_message(self):
         ''' Set the instructions for the Crawler. '''
+        print('setting message..')
         self.instructions['message'] = str(self.instructions['motor']) + ',' + str(self.instructions['steering']) + '\r'
-        self.messaging.outbound = self.instructions['message']
-        
-    def send_instructions(self):
-        ''' Send instructions via the connected serial port. '''
-        self.set_instructions()
-        self.port.write(self.instructions['message'].encode())
-        self.logger.info('Sent message: ' + self.instructions['message'])
-        #self.clear_instructions()
+        self.messaging.set_message(self.instructions['message'])
+        self.messaging.send_message()
+        #self.messaging.outbound = self.instructions['message']
 
 
     def recieve_message(self):
         ''' Recieve message from de10. '''
-        self.recieved = self.messaging.inbound
-        print(self.recieved)
+        #self.recieved = self.messaging.inbound
+        #print(self.recieved)
         #self.logger.info('Recieved message: ' + self.recieved['message'])
+        return True
 
 
     def decode_recieved_message(self):

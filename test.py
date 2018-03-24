@@ -10,7 +10,7 @@ TODO:
 #from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
-from modules.controller import OutboundMessaging, InboundMessaging
+from modules.messaging import OutboundMessaging, InboundMessaging
 from crawler import Crawler
 import serial
 import requests
@@ -18,15 +18,20 @@ import configparser
 import logging
 
 def outbound_test():
-    port = serial.Serial('dev/ttyUSB0', baudrate=115200, timeout=3.0)
+    port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=3.0)
+    port.write('*'.encode())
+    port.write("Hello".encode())
+    '''
     message = ""
     outbound_thread = OutboundMessaging(port, 0.1, message)
-    outbound_thread.start()
+    print(outbound_thread.message)
     for i in range(30):
-        outbound_thread.set_message(i)
-        delay(1)
+        outbound_thread.set_message(str(i))
+        outbound_thread.send_message()
+        sleep(1)
+        '''
 
-#outbound_test()
+outbound_test()
 
 def inbound_test():
     port = serial.Serial('dev/ttyUSB0', baudrate=115200, timeout=3.0)
