@@ -7,6 +7,7 @@ TODO:
 '''
 import serial
 from time import sleep
+from messaging import OutboundMessaging, InboundMessaging
 
 class Crawler():
     ON = 1
@@ -36,7 +37,7 @@ class Crawler():
     }
 
     recieved = {
-        'message' : ''    
+        'message' : ''
     }
 
     port = None
@@ -69,7 +70,7 @@ class Crawler():
         }
 
     def connect(self):
-        ''' Establish serial connection with DE10. '''
+        ''' Establish serial connection with DE10. Initialize communication threads.'''
         self.port = serial.Serial(self.comm['device'], baudrate=115200, timeout=3.0)
         sleep(0.5)
         self.port.flushInput()
@@ -77,6 +78,8 @@ class Crawler():
         sleep(0.5)
         self.port.write(self.messages['connect'].encode())
         sleep(0.5)
+        self.outbound_messaging = OutboundMessaging(self.port, 0.1, self.instructions['message'])
+        self.inbound_messaging = InboundMessaging(self.port, 0.2, self.recieved['message'])
         #self.recieved['message'] = self.port.read(self.comm['read_size'])
         #self.logger.debug(self.recieved['message'].decode("utf-8"))
         #print(self.recieved['message'].decode("utf-8"))
@@ -127,10 +130,10 @@ class Crawler():
         self.instructions['brake'] = str(brake)
 
 
-    def set_instructions(self):
+    def set_message(self):
         ''' Set the instructions for the Crawler. '''
         self.instructions['message'] = str(self.instructions['motor']) + ',' + str(self.instructions['steering']) + '\r'
-
+        self.outbound_messaging.set_message(self.instructions['message'])
 
     def send_instructions(self):
         ''' Send instructions via the connected serial port. '''
@@ -140,10 +143,10 @@ class Crawler():
         #self.clear_instructions()
 
 
-    def recieve_instruction(self):
+    def recieve_message(self):
         ''' Recieve message from de10. '''
-        self.recieved['message'] = self.port.read(self.comm['read_size'])
-        print('Recieved')
+        self.inbound_messaging.get_message()
+        print('Recieved.')
         #self.logger.info('Recieved message: ' + self.recieved['message'])
 
 

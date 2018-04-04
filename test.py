@@ -34,25 +34,25 @@ def crawler_test():
     #print(config['COMMUNICATION']['Baudrate'])
     crawler.configure_communication(config['COMMUNICATION'])
 
-    #controller = DS4()
+    controller = DS4()
     try:
-        #controller.connect()
+        controller.connect()
         crawler.connect()
         crawler.configure_communication()
         while True:
             print('.')
-            #crawler.set_motor_instruction(controller.get_axes()[controller.RIGHT_Y_AXIS])
-            #crawler.set_steering_instruction(controller.get_axes()[controller.LEFT_X_AXIS])
+            crawler.set_motor_instruction(controller.get_axes()[controller.RIGHT_Y_AXIS])
+            crawler.set_steering_instruction(controller.get_axes()[controller.LEFT_X_AXIS])
             #print(controller.axes)
             print(crawler.instructions)
             #crawler.send_instructions()
             sleep(0.2)
     finally:
         print('Crawler Test Done.')
-        #crawler.disconnect()
-        #controller.disconnect()
+        crawler.disconnect()
+        controller.disconnect()
 
-crawler_test()
+#crawler_test()
 
 def controller_test():
     ''' Polls connected bluetooth controller for some amount of time '''
@@ -74,6 +74,8 @@ def controller_test():
         controller.disconnect()
         print("Controller test ended.")
 
+controller_test()
+
 
 
 def camera_preview():
@@ -84,6 +86,8 @@ def camera_preview():
     sleep(10)
     camera.stop_preview()
     print("Camera preview has ended.")
+
+#camera_preview()
 
 
 def serial_test():
@@ -102,9 +106,11 @@ def serial_test():
         port.close()
         print("Completed serial test.")
 
-serial_test()
+#serial_test()
 
 def request_test():
     ''' API update test '''
     UPDATE_URL = "http://192.168.0.4:8080/api/update/"
     r = requests.post(UPDATE_URL, data={'crawler': 'crawler data here'})
+
+#request_test()

@@ -81,14 +81,24 @@ class DS4(threading.Thread):
         Keyword arguments:
         button -- integer value associated with dualshock 4 controller button (default=self.R2)
         '''
-        return self.joystick.get_button(button)
+        button = 0
+        try:
+            button = self.joystick.get_button(button)
+        except:
+            print("Can't get button.")
+            self.connected = False
+        return button
 
 
     def get_axes(self):
         ''' Return the value of all axes from the controller. '''
-        for event in pygame.event.get():
-            if event.type == pygame.JOYAXISMOTION:
-                self.axes[event.axis] = round(event.value, 2)
+        try:
+            for event in pygame.event.get():
+                if event.type == pygame.JOYAXISMOTION:
+                    self.axes[event.axis] = round(event.value, 2)
+        except:
+            print("Can't get axes. Try reconnecting to controller.")
+            self.connected = True
         return self.axes
 
 

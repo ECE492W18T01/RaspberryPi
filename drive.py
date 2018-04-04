@@ -58,10 +58,10 @@ class Drive(threading.Thread):
                 while self.controller.is_connected():
                     self.crawler.connect()
                     while self.crawler.is_connected():
-                        print('.')
-                        self.get_instructions()
-                        self.crawler.send_instructions()
-                        #self.crawler.recieve_instruction()
+                        #print('.')
+                        self.set_instructions()
+                        #self.crawler.send_instructions()
+                        self.crawler.recieve_instruction()
                         sleep(0.1)
                     sleep(10)
                 self.logger.warning('No controller connected.')
@@ -73,7 +73,7 @@ class Drive(threading.Thread):
             self.crawler.disconnect()
             return
 
-    def get_instructions(self):
+    def set_instructions(self):
         ''' Get instructions from the controller and send them to the Crawler. '''
         enabled = self.controller.get_button(self.controller.R2)
         self.crawler.set_motor_instruction(self.controller.get_axes()[self.throttle_input])
@@ -84,6 +84,9 @@ class Drive(threading.Thread):
         if end == 1:
             crawler.disconnect()
             '''
+
+    def get_instructions(self):
+        self.crawler.recieve_message()
 
     def initialize_logger(self):
         ''' Initialize the logger handlers for the drive class. '''
