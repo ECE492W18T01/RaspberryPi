@@ -2,54 +2,29 @@ from io import BytesIO
 import socket
 import struct
 import threading
+import logging
+from http import server
 from time import sleep
-from PIL import Image
-import modules.streaming as Streaming
+from modules.stream import Stream, StreamHandler, StreamingServer
+from flask import Flask
 
-class Server(threading.Thread):
-        def __init__(self, name):
-            threading.Thread.__init__(self)
-            self.name = name
-
-        def run(self):
-            try:
-                print('Server here')
-                sleep(100)
-                #address = ('', 8080)
-                #server = Streaming.Server(address, Streaming.Handler)
-                #server.serve_forever()
-            finally:
-                connection.close()
-                server_socket.close()
+app = Flask(__name__)
 
 
-class CaptureStream(threading.Thread):
-        def __init__(self, name):
-            threading.Thread.__init__(self)
-            self.name = name
-
-        def run(self):
-            while True:
-                chunk_length = struct.unpack('<L', connection.read(struct.calcsize('<L')))[0]
-                print(chunk_length)
-                stream = Streaming.Output()
-                stream.write(connection.read(chunk_length))
+format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('server.py')
+logger.setLevel('INFO')
+fh = logging.FileHandler('server.log')
+fh.setFormatter(format)
+logger.addHandler(fh)
 
 
-server_socket = socket.socket()
-server_socket.bind(('0.0.0.0', 8000))
-server_socket.listen(0)
-print('Listening at 0.0.0.0:8000')
+address = ('', 8000)
+'''
+stream = Stream()
+stream.start()
+'''
+handler = StreamHandler
+streaming_server = StreamingServer(address, handler)
 
-# Accept a single connection and make a file-like object out of it
-connection = server_socket.accept()[0].makefile('rb')
-
-server_thread = Server('Streaming Server')
-stream_thread = CaptureStream('Capture Stream')
-
-
-server_thread.start()
-stream_thread.start()
-
-server_thread.join()
-stream_thread.join()
+streaming_server.serve_forever()
