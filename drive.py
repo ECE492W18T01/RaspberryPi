@@ -47,23 +47,25 @@ class Drive(threading.Thread):
             Run the drive process. Connects to web API and loops indefinetly looking
             for input.
          '''
+        print('Running..')
+        print(self.crawler.info())
         network_thread = Network(self.crawler, self.logger, self.config['NETWORK'])
         network_thread.start()
         try:
             while True:
-                self.controller.connect()
-                while self.controller.is_connected():
+                if self.controller.connect():
                     self.logger.debug('Controller connected.')
+                while self.controller.is_connected():
                     self.crawler.connect()
                     while self.crawler.is_connected():
+                        print('.')
                         self.get_instructions()
                         self.crawler.send_instructions()
-                        self.crawler.recieve_instruction()
-                        sleep(1/self.crawler.comm['instruction_freq'])
-                    self.logger.warning('No controller connected.')
-                    sleep(1/self.crawler.comm['connect_freq'])
-
-        except KeyboardInterrupt():
+                        #self.crawler.recieve_instruction()
+                        sleep(0.1)
+                    sleep(10)
+                self.logger.warning('No controller connected.')
+        except KeyboardInterrupt:
             print('Shutting down')
             self.logger.info('Shutting down.')
         finally:
@@ -76,10 +78,12 @@ class Drive(threading.Thread):
         enabled = self.controller.get_button(self.controller.R2)
         self.crawler.set_motor_instruction(self.controller.get_axes()[self.throttle_input])
         self.crawler.set_steering_instruction(self.controller.get_axes()[self.steering_input])
-        self.crawler.set_brake_instruction(self.controller.get_button(self.brake_input))
-        end = self.controller.get_button(self.end_input)
+        #self.crawler.set_brake_instruction(self.controller.get_button(self.brake_input))
+        #end = self.controller.get_button(self.end_input)
+        '''
         if end == 1:
             crawler.disconnect()
+            '''
 
     def initialize_logger(self):
         ''' Initialize the logger handlers for the drive class. '''

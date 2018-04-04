@@ -6,6 +6,7 @@ TODO:
 - Implement serial connection failure protocols.
 '''
 import serial
+from time import sleep
 
 class Crawler():
     ON = 1
@@ -34,7 +35,9 @@ class Crawler():
         'brake' : OFF
     }
 
-    recieved = {}
+    recieved = {
+        'message' : ''    
+    }
 
     port = None
     messages = {}
@@ -67,25 +70,38 @@ class Crawler():
 
     def connect(self):
         ''' Establish serial connection with DE10. '''
-        self.port = serial.Serial(device=self.comm['device'], baudrate=self.comm['baudrate'], timeout=self.comm['timeout'])
+        self.port = serial.Serial(self.comm['device'], baudrate=115200, timeout=3.0)
+        sleep(0.5)
+        self.port.flushInput()
+        self.port.flushOutput()
+        sleep(0.5)
         self.port.write(self.messages['connect'].encode())
-        self.recieved['message'] = self.port.read(self.comm['read_size'])
-        self.logger.debug(self.recieved['message'].decode("utf-8"))
+        sleep(0.5)
+        #self.recieved['message'] = self.port.read(self.comm['read_size'])
+        #self.logger.debug(self.recieved['message'].decode("utf-8"))
+        #print(self.recieved['message'].decode("utf-8"))
+        #print(self.messages['ack'])
+        self.connected = True
+        '''
         if self.recieved['message'].decode("utf-8") is self.messages['ack']:
             self.connected = True
-            self.logger.info('Connected to Crawler.')
+            self.logger.debug('Connected to Crawler.')
+            return True
         else:
             self.connected = False
-            self.logger.info("Can't connect to Crawler. Make sure device is connected.")
+            self.logger.debug("Can't connect to Crawler. Make sure device is connected.")
+            return False
+            '''
 
 
     def disconnect(self):
         ''' Disconnect from DE10. '''
-        self.port.write(self.messages['disconnect'].encode())
+        if self.port is not None:
+            self.port.write(self.messages['disconnect'].encode())
         self.connected = False
-        self.comm.recieved = {}
+        self.recieved = {}
         self.clear_instructions()
-        self.logger.info('Crawler disconnected.')
+        self.logger.debug('Crawler disconnected.')
 
 
     def clear_instructions(self):
@@ -113,7 +129,7 @@ class Crawler():
 
     def set_instructions(self):
         ''' Set the instructions for the Crawler. '''
-        self.instructions['message'] = str(self.instructions['motor']) + ',' + str(self.instructions['steering']) + ',' + str(self.instructions['brake']) + '\r'
+        self.instructions['message'] = str(self.instructions['motor']) + ',' + str(self.instructions['steering']) + '\r'
 
 
     def send_instructions(self):
@@ -121,13 +137,14 @@ class Crawler():
         self.set_instructions()
         self.port.write(self.instructions['message'].encode())
         self.logger.info('Sent message: ' + self.instructions['message'])
-        self.clear_instructions()
+        #self.clear_instructions()
 
 
     def recieve_instruction(self):
         ''' Recieve message from de10. '''
         self.recieved['message'] = self.port.read(self.comm['read_size'])
-        self.logger.info('Recieved message: ' + self.recieved['message'])
+        print('Recieved')
+        #self.logger.info('Recieved message: ' + self.recieved['message'])
 
 
     def is_connected(self):
