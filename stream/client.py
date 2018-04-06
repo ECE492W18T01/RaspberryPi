@@ -25,7 +25,7 @@ try:
         start = time.time()
         count = 0
         stream = BytesIO()
-        
+
         for _ in camera.capture_continuous(stream, 'jpeg', use_video_port=True):
             connection.write(struct.pack('<L', stream.tell()))
             connection.flush()
@@ -36,7 +36,7 @@ try:
                 break
             stream.seek(0)
             stream.truncate()
-        
+
     connection.write(struct.pack('<L', 0))
 
 
@@ -44,5 +44,5 @@ finally:
     connection.close()
     client_socket.close()
     finish = time.time()
-    
+
     print('Sent %d images in %d seconds at %.2ffps' %(count, finish-start, count/(finish-start)))

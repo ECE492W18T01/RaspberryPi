@@ -3,28 +3,19 @@ import socket
 import struct
 import threading
 import logging
-from http import server
 from time import sleep
-from modules.stream import Stream, StreamHandler, StreamingServer
-from flask import Flask
+from stream import Stream, StreamingServer
+from flask import Flask, render_template, Response
+import PIL
+from PIL import Image
+from flask_socketio import SocketIO
+import http.server
+import socketserver
 
-app = Flask(__name__)
+PORT = 8000
 
+Handler = http.server.SimpleHTTPRequestHandler
 
-format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('server.py')
-logger.setLevel('INFO')
-fh = logging.FileHandler('server.log')
-fh.setFormatter(format)
-logger.addHandler(fh)
-
-
-address = ('', 8000)
-'''
-stream = Stream()
-stream.start()
-'''
-handler = StreamHandler
-streaming_server = StreamingServer(address, handler)
-
-streaming_server.serve_forever()
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    httpd.serve_forever()
