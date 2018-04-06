@@ -3,7 +3,7 @@ import socket
 import struct
 import time
 from picamera import PiCamera
-import modules.streaming as Streaming
+import modules.stream as Streaming
 import PIL.Image as Image
 
 # Connect a client socket to my_server:8000 (change my_server to the
@@ -30,12 +30,14 @@ try:
             connection.write(struct.pack('<L', stream.tell()))
             connection.flush()
             stream.seek(0)
-            print(connection.write(stream.read()))
+            frame = connection.write(stream.read())
+            print(frame)
             count += 1
             if time.time() - start > 30:
                 break
             stream.seek(0)
             stream.truncate()
+            time.sleep(6)
         
     connection.write(struct.pack('<L', 0))
 

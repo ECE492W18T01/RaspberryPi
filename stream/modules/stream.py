@@ -12,7 +12,7 @@ import os
 #web_dir = os.path.join(os.path.dirname(__file__))
 #os.chdir(web_dir)
 
-class Stream(threading.Thread):
+class Stream(threading.Thread, object):
     def __init__(self):
         threading.Thread.__init__(self)
         self.frame = None
