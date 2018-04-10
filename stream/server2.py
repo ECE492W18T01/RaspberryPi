@@ -45,6 +45,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
             self.send_header('Content-Length', len(content))
+            self.send_header('Access-Control-Allow-Origin', 'http://localhost:3000')
             self.end_headers()
             self.wfile.write(content)
         elif self.path == '/stream.mjpg':
@@ -53,6 +54,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Cache-Control', 'no-cache, private')
             self.send_header('Pragma', 'no-cache')
             self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+            self.send_header('Access-Control-Allow-Origin', 'http://localhost:3000')
             self.end_headers()
             try:
                 while True:
