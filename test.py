@@ -10,12 +10,27 @@ TODO:
 #from picamera import PiCamera
 from time import sleep
 from modules.controller import DS4
-from modules.messaging import OutboundMessaging, InboundMessaging
+from modules.messaging import OutboundMessaging, InboundMessaging, SerialMessaging, SerialPort
 from crawler import Crawler
 import serial
 import requests
 import configparser
 import logging
+
+def serial_messaging_test():
+    options = {
+        'Baudrate' = 115200,
+        'Timeout' = 3.0,
+        'Device' = '/dev/ttyUSB0'
+    }
+    messenger = SerialMessaging(options)
+    while True:
+        messenger.connect():
+        while messenger.connect():
+            msg, time = recieve_message()
+            print(msg)
+            sleep(2)
+
 
 def outbound_test():
     port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=3.0)
@@ -41,11 +56,11 @@ def inbound_test():
     for i in range(30):
         outbound_thread.get_message()
         delay(1)
-        
+
 #inbound_test()
 
 def crawler_test():
-    #Attempts to connect with the crawler and send instructions. 
+    #Attempts to connect with the crawler and send instructions.
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger('Crawler Test')
     logger.setLevel(logging.INFO)
@@ -80,7 +95,6 @@ def crawler_test():
 
 #crawler_test()
 
-
 def controller_test():
     ''' Polls connected bluetooth controller for some amount of time '''
     print("Controller test started..")
@@ -107,8 +121,6 @@ def controller_test():
 
 #controller_test()
 
-
-
 def camera_preview():
     ''' Quick picamera preview '''
     print("Camera preview Started, please have monitor connected..")
@@ -119,7 +131,6 @@ def camera_preview():
     print("Camera preview has ended.")
 
 #camera_preview()
-
 
 def serial_test():
     ''' Serial test used to ensure proper setup between de10 and RPI '''

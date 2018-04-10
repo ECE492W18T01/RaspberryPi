@@ -8,7 +8,7 @@ TODO:
 import serial
 from time import sleep
 from modules.messaging import SerialMessaging
-
+from math import pow
 
 class Crawler():
     ON = 1
@@ -16,12 +16,13 @@ class Crawler():
     CENTER = 0.0
 
     connected = False
+
     status = {
         'mode' : 0,
-        'motors' : 0.0,
+        'motors' : CENTER,
         'steering' : CENTER,
         'battery' : 0,
-
+        'time': 0.0,
         'wheels' : {
             'fl' : 0,
             'fr' : 0,
@@ -60,11 +61,12 @@ class Crawler():
             print('Created serial port.')
             print(str(self.messaging.connect))
             self.connected = self.messaging.authorize()
-            #self.messaging.start_communication()
+            #Use services if multi-threaded messaging is enabled
+            #self.messaging.start_services()
             self.connected = True
         return self.connected
-            
-            
+
+
     def disconnect(self):
         ''' Disconnect from DE10. '''
         self.connected = False
@@ -89,6 +91,8 @@ class Crawler():
 
     def set_steering_instruction(self, x_axis):
         ''' Set desired steering instruction. '''
+        #Smoothed steering instruction
+        #self.instructions['steering'] = str(round(pow(64, x_axis)))
         self.instructions['steering'] = str(round(x_axis * 64))
 
 
@@ -102,20 +106,21 @@ class Crawler():
         print('setting message..')
         self.instructions['message'] = str(self.instructions['motor']) + ',' + str(self.instructions['steering']) + '\r'
         self.messaging.set_message(self.instructions['message'])
-        self.messaging.send_message()
-        #self.messaging.outbound = self.instructions['message']
 
+    def send_message(self):
+        self.messaging.send_message()
 
     def recieve_message(self):
         ''' Recieve message from de10. '''
-        #self.recieved = self.messaging.inbound
-        #print(self.recieved)
-        #self.logger.info('Recieved message: ' + self.recieved['message'])
+        message, time = self.messaging.recieve_message()
+        self.recieved['message'] = message
+        self.recieved = time
+        self.decode_recieved_message()
         return True
 
 
     def decode_recieved_message(self):
-        return true
+        return True
 
     def is_connected(self):
         ''' Returns True if Crawler is connected. '''

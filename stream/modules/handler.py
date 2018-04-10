@@ -1,6 +1,6 @@
+from http import server
 
-
-class StreamHandler(server.BaseHTTPRequestHandler):
+class StreamingHandler(server.BaseHTTPRequestHandler):
 
     def set_stream(stream):
         this.stream = stream

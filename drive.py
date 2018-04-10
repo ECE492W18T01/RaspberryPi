@@ -66,9 +66,8 @@ class Drive(threading.Thread):
                         print('.')
                         self.set_instructions()
                         self.crawler.set_instruction_message()
-                        print(self.crawler.instructions)
-                        #self.crawler.send_instructions()
-                        #self.crawler.recieve_instruction()
+                        self.crawler.send_message()
+                        #self.crawler.recieve_message()
                         sleep(1/self.controller.POLL_FREQUENCY)
                     sleep(1/self.controller.CONNECT_FREQUENCY)
                 self.logger.warning('No controller connected.')
@@ -86,10 +85,6 @@ class Drive(threading.Thread):
         self.controller.get_axes()
         self.crawler.set_motor_instruction(self.controller.axes[self.throttle_input])
         self.crawler.set_steering_instruction(self.controller.axes[self.steering_input])
-
-
-    def get_instructions(self):
-        self.crawler.recieve_message()
 
     def initialize_logger(self):
         ''' Initialize the logger handlers for the drive class. '''
