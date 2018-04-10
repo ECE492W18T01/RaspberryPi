@@ -1,6 +1,7 @@
 from io import BytesIO
 import socket
 import struct
+from time import sleep
 
 class StreamingClient():
     SEND_FREQUENCY = 0.5
@@ -17,6 +18,7 @@ class StreamingClient():
         self.connection = self.socket.makefile('wb')
 
     def authorize(self):
+        self.connection.write(b'12345')
         return True
 
     def stream_data(self, frequency):
@@ -27,7 +29,7 @@ class StreamingClient():
         print(self.frame)
         self.stream.seek(0)
         self.stream.truncate()
-        time.sleep(1/frequency)
+        sleep(1/frequency)
 
     def end_session(self):
         self.connection.write(struct.pack('<L', 0))
@@ -37,9 +39,9 @@ class StreamingClient():
     def run(self):
         while True:
             self.connect()
-            if self..authorize():
+            if self.authorize():
                 try:
                     self.stream_data(self.send_frequency)
-                except:
+                finally:
                     self.end_session()
             sleep(self.connect_frequency)
