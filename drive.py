@@ -58,11 +58,11 @@ class Drive(threading.Thread):
                 while self.controller.is_connected():
                     self.crawler.connect()
                     while self.crawler.is_connected():
-                        print('.')
+                        #print('.')
                         self.set_instructions()
                         self.crawler.set_instruction_message()
                         self.crawler.send_message()
-                        #self.crawler.recieve_messages()
+                        self.crawler.recieve_messages()
                         sleep(1/self.controller.POLL_FREQUENCY)
                     sleep(1/self.controller.CONNECT_FREQUENCY)
                 self.logger.warning('No controller connected.')

@@ -106,7 +106,7 @@ class SerialMessaging():
 
     def connect(self):
         ''' Attempt to create serial port for communication. '''
-        self.port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=3.0)
+        self.port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=0.5)
         self.is_connected = True
         return self.is_connected
 

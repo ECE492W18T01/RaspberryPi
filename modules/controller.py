@@ -26,7 +26,7 @@ class DS4(threading.Thread):
     connected = False
 
     CONNECT_FREQUENCY = 1/10
-    POLL_FREQUENCY = 10
+    POLL_FREQUENCY = 20
 
     ''' PS4 buttons indices '''
     SQUARE = 0

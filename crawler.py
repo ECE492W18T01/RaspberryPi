@@ -65,8 +65,7 @@ class Crawler():
         self.logger = logger
         self.recieved['messages'] = Queue()
         self.messaging = SerialMessaging(options, self.recieved['messages'])
-        self.network = Network(self.logger)
-        self.network.set_message(self.status)
+
 
     def get_status(self):
         ''' Return dictionary of Crawler status. '''
@@ -130,6 +129,7 @@ class Crawler():
 
     def recieve_messages(self):
         ''' Recieve message from de10. '''
+        print('Recieving message.')
         self.messaging.recieve_messages()
         self.set_crawler_status()
         return True
@@ -159,6 +159,7 @@ class Crawler():
             except:
                 print('Error handling message: ' + row)
         print(self.status)
+        self.network = Network()
         self.network.set_message(self.status)
         self.network.start()
         return True
