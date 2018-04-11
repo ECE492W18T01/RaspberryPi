@@ -86,7 +86,7 @@ class SerialMessaging():
         'end': '\r'
     }
 
-    read_size = 256
+    read_size = 128
     is_connected = False
     outbound_messages = None
     outbound_service_set = False
@@ -95,12 +95,12 @@ class SerialMessaging():
     buffer = None
     port = None
 
-    def __init__(self, options, outbound_queue):
+    def __init__(self, options, inbound_queue):
         self.options = options
         self.configure(options)
         self.outbound_service = OutboundMessaging(self.port, 0.1)
         self.inbound_service = InboundMessaging(self.port, 0.2)
-        self.outbound_messages = outbound_queue
+        self.inbound_messages = inbound_queue
         self.pattern = re.compile('!.*\n')
         self.threads = []
 
@@ -140,6 +140,8 @@ class SerialMessaging():
 
     def send_message(self):
         #flush before writing
+        print('Sending message')
+        print(self.outbound_message.encode())
         self.port.write(self.outbound_message.encode())
         #self.outbound_service.start()
         return True
@@ -153,7 +155,7 @@ class SerialMessaging():
         matches = self.pattern.findall(buffer.decode())
         for match in matches:
             message = re.sub('\n', '', re.sub('!', '', match))
-            self.outbound_messages.put(message)
+            self.inbound_messages.put(message)
         
 
     def set_outbound_message(self, message):

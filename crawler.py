@@ -158,7 +158,6 @@ class Crawler():
                         self.handle_toggle_message(row)
             except:
                 print('Error handling message: ' + row)
-        print(self.status)
         self.network = Network()
         self.network.set_message(self.status)
         self.network.start()
