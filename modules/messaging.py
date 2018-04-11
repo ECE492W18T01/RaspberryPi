@@ -3,6 +3,9 @@ from threading import Condition
 import serial
 import time
 from time import sleep
+import re
+import json
+from queue import Queue
 
 class OutboundMessaging(threading.Thread):
     message = ""
@@ -44,11 +47,10 @@ class InboundMessaging(threading.Thread):
     message = ""
     status = False
 
-    def __init__(self, port, frequency, message):
+    def __init__(self, port, frequency):
         threading.Thread.__init__(self)
         self.port = port
         self.frequency = frequency
-        self.message = message
 
     def run(self):
         self.is_running = True
@@ -86,30 +88,33 @@ class SerialMessaging():
 
     read_size = 256
     is_connected = False
-    outbound_message = ""
+    outbound_messages = None
     outbound_service_set = False
     inbound_message = ""
     inbound_service_set = False
     buffer = None
+    port = None
 
-    def __init__(self, options):
+    def __init__(self, options, outbound_queue):
         self.options = options
         self.configure(options)
-        self.port = SerialPort()
-        self.outbound_service = OutboundMessaging(self.port, 0.1, self.outbound_message)
-        self.inbound_service = InboundMessaging(self.port, 0.2, self.inbound_message)
+        self.outbound_service = OutboundMessaging(self.port, 0.1)
+        self.inbound_service = InboundMessaging(self.port, 0.2)
+        self.outbound_messages = outbound_queue
+        self.pattern = re.compile('!.*\n')
         self.threads = []
 
     def connect(self):
         ''' Attempt to create serial port for communication. '''
-        self.is_connected = self.port.connect()
+        self.port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=3.0)
+        self.is_connected = True
         return self.is_connected
 
     def authorize(self):
         ''' Authorize communication with Crawler. '''
         print('Initializing communication.')
         print(self.symbols['connect'])
-        self.port.write(str(self.symbol['connect']).encode())
+        self.port.write(str(self.symbols['connect']).encode())
         return True
 
     def disconnect(self):
@@ -129,21 +134,27 @@ class SerialMessaging():
         self.outbound_service.end()
         self.inbound_service_set = False
         self.inbound_service.end()
+        
+    def set_message(self, message):
+        self.outbound_message = message
 
     def send_message(self):
-        self.port.write(self.outbound_outbound.encode())
+        #flush before writing
+        self.port.write(self.outbound_message.encode())
         #self.outbound_service.start()
         return True
 
-    def recieve_message(self):
-        recieve_buffer = self.port.read(256)
-        time = time.time()
-        if recieve_buffer[0] is self.symbols.start:
-            #Read up to end character
-            #Convert to JSON object
-            #Identify message type
-            #Return message
-        return (message, time)
+    def recieve_messages(self):
+        self.decode_messages(self.port.read(self.read_size))
+        #flush after reading
+        return self.inbound_message
+    
+    def decode_messages(self, buffer):
+        matches = self.pattern.findall(buffer.decode())
+        for match in matches:
+            message = re.sub('\n', '', re.sub('!', '', match))
+            self.outbound_messages.put(message)
+        
 
     def set_outbound_message(self, message):
         self.outbound_message = message
@@ -167,6 +178,7 @@ class SerialPort():
         condition = Condition()
 
     def connect(self):
+        print('Creating port..')
         self.port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=3.0)
         return True
 

@@ -10,6 +10,7 @@ import threading
 import configparser
 from time import sleep
 import os
+import json
 
 
 class Network(threading.Thread):
@@ -31,8 +32,14 @@ class Network(threading.Thread):
     def run(self):
         while True:
             try:
-                r = requests.post(self.api_update, data={'crawler': self.crawler.info() })
+                print('Starting network call..')
+                payload = self.crawler.get_status()
+                print('Payload: ' + payload)
+                print('Attempting to send message to website.')
+                r = requests.post(self.api_update, data={'crawler': payload})
+                print(r)
                 sleep(1/self.frequency)
             except:
+                print("Failed to POST to ", self.api_update)
                 self.logger.error(("Failed to POST to ", self.api_update))
                 sleep(self.timeout)

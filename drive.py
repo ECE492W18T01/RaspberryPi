@@ -50,7 +50,6 @@ class Drive(threading.Thread):
             for input.
          '''
         print('Running..')
-        print(self.crawler.info())
         '''
         network_thread = Network(self.crawler, self.logger, self.config['NETWORK'])
         network_thread.start()
@@ -67,7 +66,7 @@ class Drive(threading.Thread):
                         self.set_instructions()
                         self.crawler.set_instruction_message()
                         self.crawler.send_message()
-                        #self.crawler.recieve_message()
+                        #self.crawler.recieve_messages()
                         sleep(1/self.controller.POLL_FREQUENCY)
                     sleep(1/self.controller.CONNECT_FREQUENCY)
                 self.logger.warning('No controller connected.')
