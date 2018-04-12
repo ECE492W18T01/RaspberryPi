@@ -46,14 +46,10 @@ class Drive(threading.Thread):
 
     def run(self):
         '''
-            Run the drive process. Connects to web API and loops indefinetly looking
-            for input.
+            Run the drive process.
          '''
         print('Running..')
-        '''
-        network_thread = Network(self.crawler, self.logger, self.config['NETWORK'])
-        network_thread.start()
-        '''
+
         try:
             while True:
                 if self.controller.connect():

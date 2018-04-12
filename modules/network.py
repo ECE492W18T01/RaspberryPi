@@ -16,12 +16,14 @@ import json
 class Network(threading.Thread):
     frequency = 0.5
     timeout = 10
+    ip = "http:192.168.1.101:"
+    port = 3000
+    api = "/api/update/"
 
-    def __init__(self, crawler, logger, config):
+    def __init__(self, logger):
         threading.Thread.__init__(self)
-        self.crawler = crawler
         self.logger = logger
-        self.configure(config)
+        self.api_url = self.ip + self.port + self.api
 
     def configure(self, config):
         self.url = config['Url']
@@ -29,17 +31,17 @@ class Network(threading.Thread):
         self.frequency = float(config['PostFrequency'])
         self.timeout = float(config['Timeout'])
 
+    def set_message(self, message):
+        self.message = message
+        return True
+
     def run(self):
-        while True:
-            try:
-                print('Starting network call..')
-                payload = self.crawler.get_status()
-                print('Payload: ' + payload)
-                print('Attempting to send message to website.')
-                r = requests.post(self.api_update, data={'crawler': payload})
-                print(r)
-                sleep(1/self.frequency)
-            except:
-                print("Failed to POST to ", self.api_update)
-                self.logger.error(("Failed to POST to ", self.api_update))
-                sleep(self.timeout)
+        try:
+            print('Starting network call..')
+            print('Payload: ' + self.message)
+            r = requests.post(self.api_url, data={'crawler': self.message})
+            print(r)
+        except:
+            print("Failed to POST to ", self.api_update)
+            self.logger.error(("Failed to POST to ", self.api_update))
+        return True

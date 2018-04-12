@@ -12,6 +12,7 @@ from math import pow
 from queue import Queue
 from io import StringIO
 import csv
+from modules.network import Network
 
 class Crawler():
     ON = 1
@@ -21,12 +22,20 @@ class Crawler():
     connected = False
 
     status = {
-        'connected' : True,
+        'connected' : 1,
         'message' : "Crawler not connected.",
         'brake' : 0,
         'distance' : 0,
-        'last_updated': None,
+        'last_updated': "",
         'motors' : {
+            'fl' : 0,
+            'fr' : 0,
+            'rl' : 0,
+            'rr' : 0,
+            'steering' : 0
+        },
+        'fuzzy' : {
+            'enabled': 0,
             'fl' : 0,
             'fr' : 0,
             'rl' : 0,
@@ -37,16 +46,7 @@ class Crawler():
             'fl' : 0,
             'fr' : 0,
             'rl' : 0,
-            'rr' : 0,
-            'steering' : 0,
-        },
-        'fuzzy' : {
-            'enabled': 0,
-            'fl' : 0,
-            'fr' : 0,
-            'rl' : 0,
-            'rr' : 0,
-            'steering' : 0,
+            'rr' : 0
         }
     }
 
@@ -65,7 +65,8 @@ class Crawler():
         self.logger = logger
         self.recieved['messages'] = Queue()
         self.messaging = SerialMessaging(options, self.recieved['messages'])
-        
+        self.network = Network(self.logger)
+        self.network.set_message(self.status)
 
     def get_status(self):
         ''' Return dictionary of Crawler status. '''
@@ -129,10 +130,7 @@ class Crawler():
 
     def recieve_messages(self):
         ''' Recieve message from de10. '''
-        #print('Recieving message.')
         self.messaging.recieve_messages()
-        #print(self.recieved['messages'].qsize())
-        #self.recieved['time'] = time
         self.set_crawler_status()
         return True
 
@@ -161,8 +159,10 @@ class Crawler():
             except:
                 print('Error handling message: ' + row)
         print(self.status)
+        self.network.set_message(self.status)
+        self.network.start()
         return True
-    
+
     def handle_sensor_message(self, message):
         #print(message[0] + '. Hall sensor readings')
         #    1, fl, fr, rl, rr
@@ -183,18 +183,19 @@ class Crawler():
         self.status['fuzzy']['rr'] = message[4]
         self.status['fuzzy']['steering'] = message[5]
         return True
-        
+
     def handle_distance_message(self, message):
+        #print(message[0] + '. Distance message')
         #    3, distance
         #ex. 3, 0
         self.status['distance'] = message[1]
         return True
-        
+
     def handle_status_message(self, message):
         #print(message[0] + '. Status message')
         # Not implemented
         return True
-        
+
     def handle_motor_message(self, message):
         #print(message[0] + '. Motor output message')
         #    5, fl, fr, rl, rr, steering
@@ -205,7 +206,7 @@ class Crawler():
         self.status['motors']['rr'] = message[4]
         self.status['motors']['steering'] = message[5]
         return True
-        
+
     def handle_toggle_message(self, message):
         #print(message[0] + '. Toggle Message')
         #    6, ebrake, fuzzy
