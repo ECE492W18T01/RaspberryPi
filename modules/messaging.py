@@ -9,66 +9,38 @@ from queue import Queue
 
 class OutboundMessaging(threading.Thread):
     message = ""
-    status = False
 
-    def __init__(self, port, frequency):
+    def __init__(self, port):
         threading.Thread.__init__(self)
         self.port = port
-        self.frequency = frequency
 
     def run(self):
-        self.is_running = True
-        while self.is_running:
-            try:
-                self.port.write(self.message)
-                self.status = True
-            except:
-                print("Outbound messaging stopped working.")
-                self.status = False
-            sleep(1/self.frequency)
-
-    def end(self):
-        self.is_running = False
-
-    def send_messsage(self):
-        self.port.write(this.message.encode())
-        return True
+        self.port.write(self.message)
 
     def set_message(self, message):
         self.message = message.encode()
         return True
 
-    def get_status(self):
-        return self.status
-
 
 class InboundMessaging(threading.Thread):
     read_size = 128
-    message = ""
     status = False
 
-    def __init__(self, port, frequency):
+    def __init__(self, port, pattern, queue):
         threading.Thread.__init__(self)
         self.port = port
-        self.frequency = frequency
+        self.pattern = pattern
+        self.queue = queue
 
     def run(self):
-        self.is_running = True
-        while self.is_running:
-            try:
-                self.message = self.port.read(self.read_size)
-                self.status = True
-            except:
-                print("Inbound message not recieved.")
-                self.status = False
-            sleep(1/self.frequency)
+        buffer = self.port.read(self.read_size)
+        self.decode_messages(buffer)
 
-    def end(self):
-        self.is_running = False
-
-    def read_message(self):
-        self.message = self.port.read(self.read_size)
-        return self.message
+    def decode_messages(self, buffer):
+        matches = self.pattern.findall(buffer.decode())
+        for match in matches:
+            message = re.sub('\n', '', re.sub('!', '', match))
+            self.outbound_messages.put(message)
 
     def get_message(self):
         return this.message
@@ -95,12 +67,10 @@ class SerialMessaging():
     buffer = None
     port = None
 
-    def __init__(self, options, outbound_queue):
+    def __init__(self, options, inbound_queue):
         self.options = options
         self.configure(options)
-        self.outbound_service = OutboundMessaging(self.port, 0.1)
-        self.inbound_service = InboundMessaging(self.port, 0.2)
-        self.outbound_messages = outbound_queue
+        self.inbound_messages = inbound_queue
         self.pattern = re.compile('!.*\n')
         self.threads = []
 
@@ -121,40 +91,31 @@ class SerialMessaging():
         self.is_connected = False
         return True
 
-    def start_services(self):
-        print('Starting messaging services.')
-        self.outbound_service.start()
-        self.outbound_service_set = True
-        self.inbound_service.start()
-        self.inbound_service_set = True
-
-    def end_services(self):
-        print('Ending messaging services.')
-        self.outbound_service_set = False
-        self.outbound_service.end()
-        self.inbound_service_set = False
-        self.inbound_service.end()
-        
     def set_message(self, message):
         self.outbound_message = message
 
     def send_message(self):
         #flush before writing
-        self.port.write(self.outbound_message.encode())
+        self.outbound_service = OutboundMessaging(self.port, 0.1)
+        self.outbound_service.set_message(self.outbound_message.encode())
+        self.outbound_service.start()
+        #self.port.write(self.outbound_message.encode())
         #self.outbound_service.start()
         return True
 
     def recieve_messages(self):
-        self.decode_messages(self.port.read(self.read_size))
+        self.inbound_service = InboundMessaging(self.port, 0.2, )
+        self.inbound_service.start()
+        #self.decode_messages(self.port.read(self.read_size))
         #flush after reading
         return self.inbound_message
-    
+
     def decode_messages(self, buffer):
         matches = self.pattern.findall(buffer.decode())
         for match in matches:
             message = re.sub('\n', '', re.sub('!', '', match))
             self.outbound_messages.put(message)
-        
+
 
     def set_outbound_message(self, message):
         self.outbound_message = message
@@ -168,28 +129,3 @@ class SerialMessaging():
         self.timeout = float(options['Timeout'])
         self.device = options['Device']
         return True
-
-
-class SerialPort():
-    port = None
-    device = '/dev/ttyUSB0'
-
-    def __init__(self):
-        condition = Condition()
-
-    def connect(self):
-        print('Creating port..')
-        self.port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=3.0)
-        return True
-
-    def write(self, message):
-        with self.condition:
-            self.port.write()
-            self.condition.notify_all()
-        return True
-
-    def read(self):
-        with self.condition:
-            message = self.port.read()
-            self.condition.notify_all()
-        return message
