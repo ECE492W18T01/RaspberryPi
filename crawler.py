@@ -1,9 +1,5 @@
-''' Crawler Module
-
+''' Crawler
 High Level interface to the Smart Tank Crawler.
-
-TODO:
-- Implement serial connection failure protocols.
 '''
 import serial
 from time import sleep
@@ -60,11 +56,19 @@ class Crawler():
     recieved = {
         'messages' : None
     }
+    
+    network_messages = None
 
     def __init__(self, logger, options):
         self.logger = logger
         self.recieved['messages'] = Queue()
         self.messaging = SerialMessaging(options, self.recieved['messages'])
+        '''
+            Networking not fully working yet. Need to find a better way of passing the most
+            recent data to the thread.
+        self.network_messages = Queue()
+        self.network = Network(self.network_messages, str(self.status), self.status)
+        '''
 
 
     def get_status(self):
@@ -78,9 +82,9 @@ class Crawler():
         if self.messaging.connect():
             print('Created serial port.')
             self.connected = self.messaging.authorize()
-            #Use services if multi-threaded messaging is enabled
-            #self.messaging.start_services()
             self.connected = True
+            self.recieve_messages()
+            self.status['message'] = 'Crawler connected.'
         return self.connected
 
 
@@ -129,11 +133,11 @@ class Crawler():
 
     def recieve_messages(self):
         ''' Recieve message from de10. '''
-        print('Recieving message.')
         self.messaging.recieve_messages()
-        self.set_crawler_status()
         return True
-
+    
+    def start_network(self):
+        self.network.start()
 
     def set_crawler_status(self):
         print('Updating Crawler Status.')
@@ -158,10 +162,12 @@ class Crawler():
                         self.handle_toggle_message(row)
             except:
                 print('Error handling message: ' + row)
-        print(self.status)
-        self.network = Network()
-        self.network.set_message(self.status)
-        self.network.start()
+        '''
+        try:
+            self.network_messages.put(str(self.status))
+        except:
+            print('Failed to add to network queue.')
+        '''
         return True
 
     def handle_sensor_message(self, message):

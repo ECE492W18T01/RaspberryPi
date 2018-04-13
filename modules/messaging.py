@@ -1,3 +1,6 @@
+''' Messaging
+Serial messaging interface used to send and recieve messages from the serial port. 
+'''
 import threading
 from threading import Condition
 import serial
@@ -7,24 +10,10 @@ import re
 import json
 from queue import Queue
 
-class OutboundMessaging(threading.Thread):
-    message = ""
-
-    def __init__(self, port):
-        threading.Thread.__init__(self)
-        self.port = port
-
-    def run(self):
-        self.port.write(self.message)
-
-    def set_message(self, message):
-        self.message = message.encode()
-        return True
-
 
 class InboundMessaging(threading.Thread):
     read_size = 128
-    status = False
+    frequency = 10
 
     def __init__(self, port, pattern, queue):
         threading.Thread.__init__(self)
@@ -33,20 +22,23 @@ class InboundMessaging(threading.Thread):
         self.queue = queue
 
     def run(self):
-        buffer = self.port.read(self.read_size)
-        self.decode_messages(buffer)
+        ''' Read messages from the serial port and sleep when not reading. '''
+        while True:
+            try:
+                print('Recieving messages.')
+                buffer = self.port.read(self.read_size)
+                self.decode_messages(buffer)
+            except:
+                print('Port busy.')
+            finally:
+                sleep(1/self.frequency)
 
     def decode_messages(self, buffer):
+        ''' Decode messages from the read buffer. '''
         matches = self.pattern.findall(buffer.decode())
         for match in matches:
             message = re.sub('\n', '', re.sub('!', '', match))
-            self.outbound_messages.put(message)
-
-    def get_message(self):
-        return this.message
-
-    def get_status(self):
-        return this.status
+            self.queue.put(message)
 
 
 class SerialMessaging():
@@ -60,9 +52,7 @@ class SerialMessaging():
 
     read_size = 256
     is_connected = False
-    outbound_messages = None
     outbound_service_set = False
-    inbound_message = ""
     inbound_service_set = False
     buffer = None
     port = None
@@ -92,25 +82,22 @@ class SerialMessaging():
         return True
 
     def set_message(self, message):
+        ''' Set ouobound message for the serial port. '''
         self.outbound_message = message
 
     def send_message(self):
-        #flush before writing
-        self.outbound_service = OutboundMessaging(self.port, 0.1)
-        self.outbound_service.set_message(self.outbound_message.encode())
-        self.outbound_service.start()
-        #self.port.write(self.outbound_message.encode())
-        #self.outbound_service.start()
+        ''' Send the current outbound message to the connected serial port. '''
+        self.port.write(self.outbound_message.encode())
         return True
 
     def recieve_messages(self):
-        self.inbound_service = InboundMessaging(self.port, 0.2, )
-        self.inbound_service.start()
-        #self.decode_messages(self.port.read(self.read_size))
-        #flush after reading
-        return self.inbound_message
+        ''' Recieve messages on seperate thread to avoid blocking. '''
+        inbound_service = InboundMessaging(self.port, self.pattern, self.inbound_messages)
+        inbound_service.start()
+        
 
     def decode_messages(self, buffer):
+        ''' Decode method used to getting messages from a read buffer. '''
         matches = self.pattern.findall(buffer.decode())
         for match in matches:
             message = re.sub('\n', '', re.sub('!', '', match))

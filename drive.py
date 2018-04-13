@@ -1,11 +1,5 @@
 ''' Drive
-
 Main program used for driving the crawler using the dualshock 4 controller.
-
-TODO:
-- Implement a queue/messaging system for the threads to exchange data.
-- Set variables using configuration file.
-- Implement threading classes in seperate module (optional).
 '''
 
 import logging
@@ -49,7 +43,6 @@ class Drive(threading.Thread):
             Run the drive process.
          '''
         print('Running..')
-
         try:
             while True:
                 if self.controller.connect():
@@ -57,12 +50,15 @@ class Drive(threading.Thread):
                     print('Controller connected')
                 while self.controller.is_connected():
                     self.crawler.connect()
+                    '''
+                        Network features not fully implemented. 
+                    self.crawler.start_network()
+                    '''
                     while self.crawler.is_connected():
-                        #print('.')
                         self.set_instructions()
                         self.crawler.set_instruction_message()
                         self.crawler.send_message()
-                        self.crawler.recieve_messages()
+                        self.crawler.set_crawler_status()
                         sleep(1/self.controller.POLL_FREQUENCY)
                     sleep(1/self.controller.CONNECT_FREQUENCY)
                 self.logger.warning('No controller connected.')
